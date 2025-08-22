@@ -30,7 +30,11 @@ export type IconName =
   // New icons for redesigned client profile
   | 'phone' | 'location-marker'
   // New icons for Landing Page
-  | 'cpu-chip' | 'sparkles' | 'puzzle-piece' | 'twitter' | 'linkedin' | 'github';
+  | 'cpu-chip' | 'sparkles' | 'puzzle-piece' | 'twitter' | 'linkedin' | 'github'
+  // New icons for Enterprise Landing Page
+  | 'mail' | 'chat-alt' | 'api' | 'shield-check' | 'trending-up' | 'pencil-alt'
+  | 'translate' | 'lock-closed' | 'badge-check' | 'server' | 'briefcase'
+  | 'academic-cap' | 'rocket-launch';
 
 interface IconProps {
   name: IconName;
@@ -97,6 +101,19 @@ const ICONS: Record<IconName, React.ReactNode> = {
   'twitter': <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />,
   'linkedin': <><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></>,
   'github': <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />,
+  'mail': <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />,
+  'chat-alt': <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.76 9.76 0 01-2.53-.401m-1.44-4.897c.303-.526.68-1.026 1.12-1.465A7.884 7.884 0 0112 15c4.418 0 8-2.686 8-6s-3.582-6-8-6-8 2.686-8 6c0 1.309.324 2.534.86 3.626" />,
+  'api': <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />,
+  'shield-check': <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286zm0 13.036h.008v.008h-.008v-.008z" />,
+  'trending-up': <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-3.976 5.196M21.75 3l-5.196 3.976" />,
+  'pencil-alt': <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />,
+  'translate': <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 21l5.25-11.625M21 21l-5.25-11.625M3.75 5.25h16.5m-16.5 0l-1.5-1.5m1.5 1.5l1.5-1.5m13.5 13.5l1.5 1.5m-1.5-1.5l-1.5 1.5M6 5.25v.75a3.75 3.75 0 01-3.75 3.75H.75a3.75 3.75 0 01-3.75-3.75v-.75" transform="translate(3.75 0)" />,
+  'lock-closed': <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />,
+  'badge-check': <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
+  'server': <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3V7.5a3 3 0 013-3h13.5a3 3 0 013 3v3.75a3 3 0 01-3 3m-13.5 0V16.5a3 3 0 003 3h7.5a3 3 0 003-3v-2.25" />,
+  'briefcase': <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.25L21 12m0 0l-1.01-2.021M21 12c0-1.104-.896-2-2-2h-3.375M12 21c-1.104 0-2-.896-2-2v-3.375c0-.923.75-1.625 1.625-1.625h3.375c.923 0 1.625.702 1.625 1.625V19c0 1.104-.896 2-2 2z" transform="translate(-1 -1)" />,
+  'academic-cap': <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0l-1.07-1.07a52.5 52.5 0 0117.622-10.43l1.063 1.063m-1.622 12.042a52.5 52.5 0 01-17.622-10.43l1.063-1.063a52.5 52.5 0 0117.622 10.43l-1.063 1.063z" />,
+  'rocket-launch': <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56a6 6 0 01-2.82 5.04M7.41 14.37a6 6 0 017.38-5.84v4.82m-7.38 1.02a6 6 0 015.04-2.82M5.63 21a9 9 0 0112.73 0M18.37 3.63a9 9 0 010 12.73M12 3v9" />,
 };
 
 export const Icon: React.FC<IconProps> = ({ name, className }) => {

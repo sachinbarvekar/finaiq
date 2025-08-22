@@ -179,7 +179,7 @@ const DocumentViewPage: React.FC = () => {
                 <div>
                     <Link to={`/folders/${folderId}`} className="text-sm text-primary hover:underline flex items-center">
                         <Icon name="chevron-left" className="w-4 h-4 mr-1" />
-                        <span>Back to Folder</span>
+                        <span>Back to Documents</span>
                     </Link>
                 </div>
                 <div className="flex items-center space-x-2">

@@ -44,7 +44,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 // Helper function to apply theme
 const applyTheme = (themeName: string) => {
-  const theme = themes[themeName] || themes.indigo;
+  const theme = themes[themeName] || themes.teal;
   const root = document.documentElement;
   Object.entries(theme.colors).forEach(([key, value]) => {
     root.style.setProperty(key, value);
@@ -54,9 +54,9 @@ const applyTheme = (themeName: string) => {
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('app-theme') || 'indigo';
+      return localStorage.getItem('app-theme') || 'teal';
     }
-    return 'indigo';
+    return 'teal';
   });
 
   useEffect(() => {

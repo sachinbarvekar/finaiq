@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ClientStatus, DocumentProcessingStatus, FolderStatus, PaymentStatus } from '../../types';
 
@@ -19,7 +18,8 @@ const Badge: React.FC<BadgeProps> = ({ status }) => {
     [PaymentStatus.Paid]: { label: 'Paid', color: 'bg-green-100 text-green-800' },
     [PaymentStatus.Pending]: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
     [PaymentStatus.Overdue]: { label: 'Overdue', color: 'bg-red-100 text-red-800' },
-    // Client & Folder
+    // Client & Folder Statuses
+    // ClientStatus.Active and FolderStatus.Active are both 'Active'
     [ClientStatus.Active]: { label: 'Active', color: 'bg-green-100 text-green-800' },
     [ClientStatus.Inactive]: { label: 'Inactive', color: 'bg-slate-200 text-slate-700' },
     [FolderStatus.Archived]: { label: 'Archived', color: 'bg-slate-200 text-slate-700' },

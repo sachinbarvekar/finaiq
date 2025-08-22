@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useDocuments } from '../contexts/DocumentContext';
@@ -168,8 +169,9 @@ const DocumentViewPage: React.FC = () => {
     }
 
     const handleDelete = () => {
-        openDeleteModal(document.id);
-        navigate(`/dashboard/folders/${folderId}`);
+        openDeleteModal(document.id, () => {
+            navigate(`/dashboard/folders/${folderId}`);
+        });
     };
 
     return (

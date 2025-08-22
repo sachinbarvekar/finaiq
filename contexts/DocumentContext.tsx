@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { Document, Folder } from '../types';
 import { MOCK_DOCUMENTS } from '../constants';
@@ -14,7 +15,7 @@ interface DocumentContextType {
   updateDocument: (docId: string, docData: Partial<Omit<Document, 'id'>>) => void;
   deleteDocument: (docId: string) => void;
   openImportModal: (folder: Folder) => void;
-  openDeleteModal: (docId: string) => void;
+  openDeleteModal: (docId: string, onSuccess?: () => void) => void;
   openEditModal: (docId: string) => void;
 }
 
@@ -29,6 +30,7 @@ export const DocumentProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [targetFolder, setTargetFolder] = useState<Folder | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [docToDelete, setDocToDelete] = useState<Document | null>(null);
+  const [onDeleteSuccess, setOnDeleteSuccess] = useState<(() => void) | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [docToEdit, setDocToEdit] = useState<Document | null>(null);
 
@@ -81,16 +83,18 @@ export const DocumentProvider: React.FC<{ children: ReactNode }> = ({ children }
     setIsImportModalOpen(false);
   };
   
-  const openDeleteModal = (docId: string) => {
+  const openDeleteModal = (docId: string, onSuccess?: () => void) => {
     const doc = documents.find(d => d.id === docId);
     if (doc) {
       setDocToDelete(doc);
+      setOnDeleteSuccess(() => onSuccess); // Store the callback
       setIsDeleteModalOpen(true);
     }
   };
   
   const closeDeleteModal = () => {
     setDocToDelete(null);
+    setOnDeleteSuccess(null);
     setIsDeleteModalOpen(false);
   };
   
@@ -110,6 +114,9 @@ export const DocumentProvider: React.FC<{ children: ReactNode }> = ({ children }
   const handleConfirmDelete = () => {
       if (docToDelete) {
           deleteDocument(docToDelete.id);
+          if (onDeleteSuccess) {
+            onDeleteSuccess();
+          }
       }
       closeDeleteModal();
   }

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Icon, IconName } from '../components/ui/Icon';
 import Button from '../components/ui/Button';
 import { useProfile } from '../contexts/ProfileContext';
@@ -25,21 +25,33 @@ const InfoItem: React.FC<{ label: string; value: string; icon: IconName }> = ({ 
     </div>
 );
 
-const SettingToggle: React.FC<{ label: string; description: string; enabled: boolean; }> = ({ label, description, enabled }) => (
+const SettingToggle: React.FC<{ label: string; description: string; enabled: boolean; onToggle: () => void; }> = ({ label, description, enabled, onToggle }) => (
     <div className="flex items-center justify-between py-3">
         <div>
             <p className="font-medium text-slate-800">{label}</p>
             <p className="text-sm text-slate-500">{description}</p>
         </div>
-        <div className={`relative w-12 h-6 rounded-full p-1 transition-colors duration-300 cursor-pointer ${enabled ? 'bg-primary' : 'bg-slate-300'}`}>
+        <button
+            onClick={onToggle}
+            className={`relative w-12 h-6 rounded-full p-1 transition-colors duration-300 cursor-pointer ${enabled ? 'bg-primary' : 'bg-slate-300'}`}
+        >
             <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${enabled ? 'translate-x-6' : ''}`} />
-        </div>
+        </button>
     </div>
 );
 
 // Main component
 const MyProfilePage: React.FC = () => {
-  const { adminUser, openEditModal } = useProfile();
+  const { adminUser, openEditModal, openChangePasswordModal } = useProfile();
+  const [notifications, setNotifications] = useState({
+      email: true,
+      reports: true,
+      alerts: false,
+  });
+
+  const handleToggle = (key: keyof typeof notifications) => {
+      setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   return (
     <div className="space-y-6">
@@ -48,7 +60,7 @@ const MyProfilePage: React.FC = () => {
         <div className="flex items-center">
           <img
             src={adminUser.avatarUrl}
-            alt="Admin Avatar"
+            alt={adminUser.name}
             className="w-20 h-20 rounded-full object-cover border-4 border-slate-200 mr-5"
           />
           <div>
@@ -76,17 +88,19 @@ const MyProfilePage: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           <InfoCard title="Security" icon="settings">
             <div className="divide-y divide-slate-200">
-                 <SettingToggle 
-                    label="Two-Factor Authentication (2FA)"
-                    description="Enhance your account security with 2FA."
-                    enabled={true}
-                />
+                 <div className="flex items-center justify-between py-3">
+                    <div>
+                        <p className="font-medium text-slate-800">Two-Factor Authentication (2FA)</p>
+                        <p className="text-sm text-slate-500">Enhance your account security with 2FA.</p>
+                    </div>
+                    <Button variant="outline" size="sm" disabled>Enabled</Button>
+                 </div>
                  <div className="py-3 flex items-center justify-between">
                     <div>
                          <p className="font-medium text-slate-800">Password</p>
                          <p className="text-sm text-slate-500">Last changed 3 months ago.</p>
                     </div>
-                    <Button variant="outline" size="sm">Change Password</Button>
+                    <Button variant="outline" size="sm" onClick={openChangePasswordModal}>Change Password</Button>
                  </div>
             </div>
           </InfoCard>
@@ -96,17 +110,20 @@ const MyProfilePage: React.FC = () => {
                 <SettingToggle 
                     label="Email Notifications"
                     description="Receive updates about your account via email."
-                    enabled={true}
+                    enabled={notifications.email}
+                    onToggle={() => handleToggle('email')}
                 />
                  <SettingToggle 
                     label="Weekly Reports"
                     description="Get a summary of platform activity."
-                    enabled={true}
+                    enabled={notifications.reports}
+                    onToggle={() => handleToggle('reports')}
                 />
                  <SettingToggle 
                     label="System Alerts"
                     description="Receive critical alerts about system status."
-                    enabled={false}
+                    enabled={notifications.alerts}
+                    onToggle={() => handleToggle('alerts')}
                 />
              </div>
           </InfoCard>

@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, IconName } from '../ui/Icon';
 import { useAuth } from '../../contexts/AuthContext';
+import { useProfile } from '../../contexts/ProfileContext';
 
 // Mock notifications
 const notifications = [
@@ -11,12 +13,16 @@ const notifications = [
     { id: 4, icon: 'x-circle' as IconName, title: 'Export Failed', message: 'Failed to export documents for Innovate Inc.', time: '1d ago' },
 ];
 
+interface NavbarProps {
+    onMenuClick: () => void;
+}
 
-const Navbar: React.FC = () => {
+const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
+  const { adminUser } = useProfile();
   const { logout } = useAuth();
 
   useEffect(() => {
@@ -41,7 +47,17 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm p-4 flex items-center justify-end">
+    <header className="bg-white shadow-sm p-4 flex items-center justify-between">
+      <button 
+        onClick={onMenuClick}
+        className="md:hidden text-slate-500 hover:text-primary transition-colors"
+        aria-label="Open menu"
+      >
+        <Icon name="menu" className="w-6 h-6" />
+      </button>
+
+      <div className="flex-1" />
+
       <div className="flex items-center space-x-5">
         <div className="relative" ref={notificationRef}>
           <button 
@@ -92,8 +108,8 @@ const Navbar: React.FC = () => {
             aria-expanded={dropdownOpen}
           >
             <img
-              src="https://picsum.photos/id/237/200/200"
-              alt="Admin Avatar"
+              src={adminUser.avatarUrl}
+              alt={adminUser.name}
               className="w-full h-full object-cover"
             />
           </button>
@@ -104,7 +120,7 @@ const Navbar: React.FC = () => {
                 <span>Your Profile</span>
               </Link>
               <Link to="/dashboard/settings" onClick={() => setDropdownOpen(false)} className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
-                <Icon name="preferences" className="w-5 h-5 mr-3 text-slate-400" />
+                <Icon name="settings" className="w-5 h-5 mr-3 text-slate-400" />
                 <span>Settings</span>
               </Link>
               <hr className="my-1 border-slate-200" />

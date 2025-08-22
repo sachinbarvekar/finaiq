@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
@@ -8,9 +9,10 @@ interface InviteUserModalProps {
   isOpen: boolean;
   onClose: () => void;
   folders: Folder[];
+  initialFolderId?: string;
 }
 
-const InviteUserModal: React.FC<InviteUserModalProps> = ({ isOpen, onClose, folders }) => {
+const InviteUserModal: React.FC<InviteUserModalProps> = ({ isOpen, onClose, folders, initialFolderId }) => {
   const [emails, setEmails] = useState('');
   const [role, setRole] = useState('Administrator');
   const [selectedFolders, setSelectedFolders] = useState<string[]>([]);
@@ -20,9 +22,9 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ isOpen, onClose, fold
     if (isOpen) {
       setEmails('');
       setRole('Administrator');
-      setSelectedFolders([]);
+      setSelectedFolders(initialFolderId ? [initialFolderId] : []);
     }
-  }, [isOpen]);
+  }, [isOpen, initialFolderId]);
 
   const handleFolderSelect = (folderId: string) => {
     setSelectedFolders(prev =>

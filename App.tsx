@@ -19,6 +19,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import { ProfileProvider } from './contexts/ProfileContext';
 import LandingPage from './pages/LandingPage';
 import ClientProfilePage from './pages/ClientProfilePage';
+import Workflows from './pages/Workflows';
 
 const App: React.FC = () => {
   return (
@@ -45,6 +46,7 @@ const App: React.FC = () => {
                         <Route path="/folders/:folderId" element={<FolderViewPage />} />
                         <Route path="/folders/:folderId/documents/:documentId" element={<DocumentViewPage />} />
                         <Route path="/settings" element={<Settings />} />
+                        <Route path="/workflows" element={<Workflows />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </MainLayout>

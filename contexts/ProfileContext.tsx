@@ -1,12 +1,14 @@
+
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import EditProfileModal from '../components/profile/EditProfileModal';
+import ChangePasswordModal from '../components/profile/ChangePasswordModal';
 
 // Mock initial admin data
 const MOCK_ADMIN = {
   name: 'Sagar Agrobeet',
   email: 'sagar@agrobeet.com',
   role: 'Administrator',
-  avatarUrl: 'https://picsum.photos/id/237/200/200',
+  avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop',
   phone: '123-456-7890',
   team: 'Platform Operations',
   memberSince: '2022-08-22',
@@ -19,6 +21,7 @@ interface ProfileContextType {
   adminUser: AdminUser;
   updateAdminProfile: (data: EditableAdminData) => void;
   openEditModal: () => void;
+  openChangePasswordModal: () => void;
 }
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
@@ -26,6 +29,7 @@ const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [adminUser, setAdminUser] = useState<AdminUser>(MOCK_ADMIN);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
   const updateAdminProfile = (data: EditableAdminData) => {
     setAdminUser(prev => ({ ...prev, ...data }));
@@ -34,15 +38,24 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
   const openEditModal = () => setIsEditModalOpen(true);
   const closeEditModal = () => setIsEditModalOpen(false);
 
-  const handleSubmit = (data: EditableAdminData) => {
+  const openChangePasswordModal = () => setIsChangePasswordModalOpen(true);
+  const closeChangePasswordModal = () => setIsChangePasswordModalOpen(false);
+
+  const handleProfileSubmit = (data: EditableAdminData) => {
     updateAdminProfile(data);
     closeEditModal();
   };
+
+  const handleChangePasswordSubmit = () => {
+    alert('Password changed successfully!');
+    closeChangePasswordModal();
+  }
 
   const value = {
     adminUser,
     updateAdminProfile,
     openEditModal,
+    openChangePasswordModal,
   };
 
   return (
@@ -51,8 +64,13 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
       <EditProfileModal 
         isOpen={isEditModalOpen}
         onClose={closeEditModal}
-        onSubmit={handleSubmit}
+        onSubmit={handleProfileSubmit}
         currentUser={adminUser}
+      />
+      <ChangePasswordModal
+        isOpen={isChangePasswordModalOpen}
+        onClose={closeChangePasswordModal}
+        onSubmit={handleChangePasswordSubmit}
       />
     </ProfileContext.Provider>
   );

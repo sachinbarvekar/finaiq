@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Folder, FolderStatus } from '../../types';
@@ -6,9 +7,10 @@ import { Icon } from '../ui/Icon';
 
 interface FolderCardProps {
   folder: Folder;
+  openInviteModal: (folderId?: string) => void;
 }
 
-const FolderCard: React.FC<FolderCardProps> = ({ folder }) => {
+const FolderCard: React.FC<FolderCardProps> = ({ folder, openInviteModal }) => {
   const getStatusColor = (status: FolderStatus): 'green' | 'gray' | 'yellow' => {
     switch (status) {
       case FolderStatus.Active:
@@ -32,10 +34,10 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder }) => {
     </button>
   );
   
-  const handleActionClick = (e: React.MouseEvent) => {
+  const handleActionClick = (e: React.MouseEvent, action: () => void) => {
     e.preventDefault(); // Prevent navigation when an action button is clicked
     e.stopPropagation();
-    alert(`Action: ${e.currentTarget.textContent}`);
+    action();
   };
 
   return (
@@ -50,9 +52,9 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder }) => {
             <p className="text-sm text-slate-500">{folder.documentCount} documents</p>
           </div>
           <div className="mt-6 border-t border-slate-200 pt-4 space-y-2">
-            <ActionButton icon="access" label="Manage Access" onClick={handleActionClick} />
-            <ActionButton icon="preferences" label="Preferences" onClick={handleActionClick} />
-            <ActionButton icon="import" label="Import Settings" onClick={handleActionClick} />
+            <ActionButton icon="user-plus" label="Invite Users" onClick={(e) => handleActionClick(e, () => openInviteModal(folder.id))} />
+            <ActionButton icon="preferences" label="Preferences" onClick={(e) => handleActionClick(e, () => alert('Folder preferences coming soon!'))} />
+            <ActionButton icon="import" label="Import Settings" onClick={(e) => handleActionClick(e, () => alert('Import settings coming soon!'))} />
           </div>
         </div>
     </Link>

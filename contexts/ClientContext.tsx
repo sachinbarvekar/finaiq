@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { Client, ClientStatus, Folder, FolderStatus } from '../types';
 import { MOCK_CLIENTS, MOCK_FOLDERS } from '../constants';
@@ -18,7 +19,7 @@ interface ClientContextType {
   openIntegrationModal: (client: Client) => void;
   closeIntegrationModal: () => void;
   // Invite User Modal
-  openInviteModal: () => void;
+  openInviteModal: (folderId?: string) => void;
   closeInviteModal: () => void;
   // Folder Management
   folders: Folder[];
@@ -42,6 +43,8 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
   // Invite User Modal State
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [initialFolderId, setInitialFolderId] = useState<string | undefined>(undefined);
+
 
   const getClientById = (id: string) => clients.find(c => c.id === id);
   const getFolderById = (id: string) => folders.find(f => f.id === id);
@@ -69,8 +72,15 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   };
 
   // Invite User Modal Logic
-  const openInviteModal = () => setIsInviteModalOpen(true);
-  const closeInviteModal = () => setIsInviteModalOpen(false);
+  const openInviteModal = (folderId?: string) => {
+    setInitialFolderId(folderId);
+    setIsInviteModalOpen(true);
+  };
+  const closeInviteModal = () => {
+    setInitialFolderId(undefined);
+    setIsInviteModalOpen(false);
+  };
+
 
   // Client and Folder Data Logic
   const addClient = (clientData: Omit<Client, 'id' | 'status' | 'accountCreated' | 'lastActivity' | 'monthlyGrowth' | 'folderId' | 'integration' | 'approvedDocs' | 'pendingDocs' | 'rejectedDocs'>) => {
@@ -181,6 +191,7 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         isOpen={isInviteModalOpen}
         onClose={closeInviteModal}
         folders={folders}
+        initialFolderId={initialFolderId}
       />
     </ClientContext.Provider>
   );

@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export type IconName = 
@@ -36,7 +37,11 @@ export type IconName =
   | 'translate' | 'lock-closed' | 'badge-check' | 'server' | 'briefcase'
   | 'academic-cap' | 'rocket-launch'
   // New icons for Invite User modal
-  | 'user-plus' | 'information-circle';
+  | 'user-plus' | 'information-circle'
+  // New icon for workflows
+  | 'switch-horizontal'
+  // New icons for mobile drawer
+  | 'menu' | 'x';
 
 interface IconProps {
   name: IconName;
@@ -118,6 +123,9 @@ const ICONS: Record<IconName, React.ReactNode> = {
   'rocket-launch': <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56a6 6 0 01-2.82 5.04M7.41 14.37a6 6 0 017.38-5.84v4.82m-7.38 1.02a6 6 0 015.04-2.82M5.63 21a9 9 0 0112.73 0M18.37 3.63a9 9 0 010 12.73M12 3v9" />,
   'user-plus': <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />,
   'information-circle': <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
+  'switch-horizontal': <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />,
+  'menu': <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />,
+  'x': <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />,
 };
 
 export const Icon: React.FC<IconProps> = ({ name, className }) => {

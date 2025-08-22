@@ -16,7 +16,15 @@ export type IconName =
   // Integration Icons
   | 'quickbooks' | 'salesforce' | 'dropbox'
   // Document action icons
-  | 'download' | 'reprocess';
+  | 'download' | 'reprocess'
+  // Profile dropdown icon
+  | 'logout'
+  // Document view page icons
+  | 'document-duplicate' | 'zoom-in' | 'zoom-out'
+  // New icons for collapsible panel
+  | 'chevrons-left' | 'chevrons-right'
+  // New icons for password visibility
+  | 'eye' | 'eye-off';
 
 interface IconProps {
   name: IconName;
@@ -66,6 +74,14 @@ const ICONS: Record<IconName, React.ReactNode> = {
   'dropbox': <><path d="M12 2L6 6.5V11l6 4.5 6-4.5V6.5L12 2z" /><path d="M6 11l6 4.5 6-4.5" /><path d="M12 2L6 6.5 12 11l6-4.5L12 2z" /></>,
   'download': <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />,
   'reprocess': <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h5M20 20v-5h-5M4 4l1.5 1.5A9 9 0 0119.5 19.5L20 20M20 4l-1.5 1.5A9 9 0 004.5 19.5L4 20" />,
+  'logout': <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />,
+  'document-duplicate': <path strokeLinecap="round" strokeLinejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />,
+  'zoom-in': <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />,
+  'zoom-out': <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />,
+  'chevrons-left': <path strokeLinecap="round" strokeLinejoin="round" d="M11 17l-5-5 5-5m7 5l-5-5 5-5" />,
+  'chevrons-right': <path strokeLinecap="round" strokeLinejoin="round" d="M13 17l5-5-5-5M6 17l5-5-5-5" />,
+  'eye': <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></>,
+  'eye-off': <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></>,
 };
 
 export const Icon: React.FC<IconProps> = ({ name, className }) => {

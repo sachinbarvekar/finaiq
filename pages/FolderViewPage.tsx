@@ -26,7 +26,7 @@ const StatCard: React.FC<{ title: string; value: number; icon: IconName; color: 
 const FolderViewPage: React.FC = () => {
   const { folderId } = useParams<{ folderId: string }>();
   const { getFolderById } = useClients();
-  const { getDocumentsByFolderId, openAddModal, openDeleteModal } = useDocuments();
+  const { getDocumentsByFolderId, openImportModal, openDeleteModal, openEditModal } = useDocuments();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [processingFilter, setProcessingFilter] = useState<DocumentProcessingStatus | 'All'>('All');
@@ -83,11 +83,14 @@ const FolderViewPage: React.FC = () => {
 
   return (
     <div>
+       <div className="mb-6">
+            <Link to="/folders" className="text-sm text-primary hover:underline flex items-center">
+                <Icon name="chevron-left" className="w-4 h-4 mr-1" />
+                Back to Folders
+            </Link>
+        </div>
        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
             <h1 className="text-3xl font-bold text-slate-800">Folder: {folder.folderName}</h1>
-            <Button leftIcon={<Icon name="upload" className="w-5 h-5"/>} onClick={() => openAddModal(folder.id)}>
-              Upload Document
-            </Button>
         </div>
         
       {/* Stat Cards */}
@@ -135,15 +138,22 @@ const FolderViewPage: React.FC = () => {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-200">
-          <h2 className="text-xl font-bold text-slate-800">Documents</h2>
-          <p className="text-sm text-slate-500">{totalDocs} document(s) found</p>
+        <div className="flex flex-wrap justify-between items-center gap-4 p-4 border-b border-slate-200">
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">Documents</h2>
+            <p className="text-sm text-slate-500">{totalDocs} document(s) found</p>
+          </div>
+          <Button leftIcon={<Icon name="upload" className="w-5 h-5"/>} onClick={() => folder && openImportModal(folder)}>
+            Import Documents
+          </Button>
         </div>
         <DocumentTable 
             documents={paginatedDocuments} 
+            folderId={folder.id}
             onDelete={(docId) => openDeleteModal(docId)}
             onDownload={(docId) => alert(`Downloading document ${docId}`)}
             onReprocess={(docId) => alert(`Reprocessing document ${docId}`)}
+            onEdit={(docId) => openEditModal(docId)}
         />
         <Pagination 
           currentPage={currentPage}

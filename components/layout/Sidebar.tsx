@@ -11,7 +11,7 @@ interface NavItemProps {
 
 const NavItem: React.FC<NavItemProps> = ({ to, icon, label }) => {
   const activeClass = 'bg-primary text-white';
-  const inactiveClass = 'text-slate-400 hover:bg-dark-accent hover:text-white';
+  const inactiveClass = 'text-slate-500 hover:bg-slate-100 hover:text-primary';
   return (
     <NavLink
       to={to}
@@ -30,20 +30,21 @@ const NavItem: React.FC<NavItemProps> = ({ to, icon, label }) => {
 
 const Sidebar: React.FC = () => {
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-dark text-white p-4">
+    <aside className="hidden md:flex flex-col w-64 bg-white p-4 border-r border-slate-200">
       <div className="flex items-center mb-8 px-2">
-         <Icon name="logo" className="w-8 h-8 text-primary" />
-         <h1 className="ml-3 text-2xl font-bold text-white">Dashboard</h1>
+         <div className="bg-primary w-10 h-10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+            <span className="text-white text-xl font-bold">FQ</span>
+        </div>
+        <div>
+            <h1 className="text-xl font-bold text-slate-800">Finaiq</h1>
+            <p className="text-xs text-slate-500">Document Processing</p>
+        </div>
       </div>
       <nav className="flex-1">
         <NavItem to="/" icon="dashboard" label="Dashboard" />
         <NavItem to="/clients" icon="users" label="Clients" />
         <NavItem to="/folders" icon="folder" label="Folders" />
-        <NavItem to="/workflows" icon="workflow" label="Workflows" />
       </nav>
-      <div className="mt-auto">
-        <NavItem to="/settings" icon="settings" label="Settings" />
-      </div>
     </aside>
   );
 };

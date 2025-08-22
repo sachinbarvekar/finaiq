@@ -20,7 +20,7 @@ const LoginPage: React.FC = () => {
     try {
       // Use test credentials for mock login
       await login('test@gmail.com', 'test');
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Failed to sign in.');
     } finally {

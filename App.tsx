@@ -17,6 +17,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { ProfileProvider } from './contexts/ProfileContext';
+import LandingPage from './pages/LandingPage';
 
 const App: React.FC = () => {
   return (
@@ -24,11 +25,12 @@ const App: React.FC = () => {
       <ClientProvider>
         <DocumentProvider>
           <Routes>
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             
             <Route 
-              path="/*"
+              path="/dashboard/*"
               element={
                 <ProtectedRoute>
                   <ProfileProvider>
@@ -48,6 +50,8 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               } 
             />
+
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </DocumentProvider>
       </ClientProvider>

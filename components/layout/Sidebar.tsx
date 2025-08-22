@@ -41,9 +41,9 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
       <nav className="flex-1">
-        <NavItem to="/" icon="dashboard" label="Dashboard" />
-        <NavItem to="/clients" icon="users" label="Clients" />
-        <NavItem to="/folders" icon="folder" label="Folders" />
+        <NavItem to="/dashboard" icon="dashboard" label="Dashboard" />
+        <NavItem to="/dashboard/clients" icon="users" label="Clients" />
+        <NavItem to="/dashboard/folders" icon="folder" label="Folders" />
       </nav>
     </aside>
   );

@@ -28,7 +28,9 @@ export type IconName =
   // New icon for more actions menu
   | 'dots-vertical'
   // New icons for redesigned client profile
-  | 'phone' | 'location-marker';
+  | 'phone' | 'location-marker'
+  // New icons for Landing Page
+  | 'cpu-chip' | 'sparkles' | 'puzzle-piece' | 'twitter' | 'linkedin' | 'github';
 
 interface IconProps {
   name: IconName;
@@ -88,7 +90,13 @@ const ICONS: Record<IconName, React.ReactNode> = {
   'eye-off': <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></>,
   'dots-vertical': <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />,
   'phone': <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />,
-  'location-marker': <><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></>
+  'location-marker': <><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></>,
+  'cpu-chip': <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3h7.5M8.25 21h7.5M3 8.25v7.5M21 8.25v7.5M3.75 3.75h16.5v16.5H3.75V3.75zM8.25 7.5h7.5v9h-7.5v-9z" />,
+  'sparkles': <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18l-1.804-2.187m1.804-2.187L9 12l-2.187 1.804m2.187 2.187L12 15l-2.187-1.804M9.813 15.904L12 18l2.187-2.096M15.904 9.813L18 9l-2.096-1.804m2.096 1.804L15 12l2.096-2.187m-2.096 2.187L12 9l2.096-2.187M15.904 9.813L18 6l-2.187 2.096M6 9l2.187-1.804L6 6l-1.804 2.187L6 9z" />,
+  'puzzle-piece': <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 10.5a.75.75 0 00-.75.75v3.375c0 .414.336.75.75.75h3.375a.75.75 0 00.75-.75v-3.375a.75.75 0 00-.75-.75h-3.375z" /><path strokeLinecap="round" strokeLinejoin="round" d="M9 3.75H6.75A2.25 2.25 0 004.5 6v2.25M9 3.75v1.5M9 3.75V3" /><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h1.5M3.75 9H3" /><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 15h1.5M3.75 15H3" /><path strokeLinecap="round" strokeLinejoin="round" d="M9 20.25h2.25A2.25 2.25 0 0013.5 18v-2.25M9 20.25v-1.5M9 20.25V21" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 20.25h2.25a2.25 2.25 0 002.25-2.25V15M15 20.25v-1.5m0 1.5V21" /><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 9h-1.5m1.5 0H21" /><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 15h-1.5m1.5 0H21" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 3.75h2.25A2.25 2.25 0 0119.5 6v2.25M15 3.75v1.5m0-1.5V3" />,
+  'twitter': <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />,
+  'linkedin': <><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></>,
+  'github': <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />,
 };
 
 export const Icon: React.FC<IconProps> = ({ name, className }) => {

@@ -6,6 +6,7 @@ interface Theme {
   colors: {
     '--color-primary': string; // RGB values like "79 70 229"
     '--color-primary-hover': string;
+    '--color-primary-gradient-end': string;
   };
 }
 
@@ -13,23 +14,23 @@ interface Theme {
 const themes: Record<string, Theme> = {
   indigo: {
     name: 'Indigo',
-    colors: { '--color-primary': '79 70 229', '--color-primary-hover': '67 56 202' }
+    colors: { '--color-primary': '79 70 229', '--color-primary-hover': '67 56 202', '--color-primary-gradient-end': '129 140 248' }
   },
   blue: {
     name: 'Blue',
-    colors: { '--color-primary': '59 130 246', '--color-primary-hover': '37 99 235' }
+    colors: { '--color-primary': '59 130 246', '--color-primary-hover': '37 99 235', '--color-primary-gradient-end': '56 189 248' }
   },
   green: {
     name: 'Green',
-    colors: { '--color-primary': '16 185 129', '--color-primary-hover': '5 150 105' }
+    colors: { '--color-primary': '16 185 129', '--color-primary-hover': '5 150 105', '--color-primary-gradient-end': '52 211 153' }
   },
   rose: {
     name: 'Rose',
-    colors: { '--color-primary': '225 29 72', '--color-primary-hover': '190 18 60' }
+    colors: { '--color-primary': '225 29 72', '--color-primary-hover': '190 18 60', '--color-primary-gradient-end': '244 63 94' }
   },
   teal: {
     name: 'Teal',
-    colors: { '--color-primary': '21 191 233', '--color-primary-hover': '18 172 207' }
+    colors: { '--color-primary': '21 191 233', '--color-primary-hover': '18 172 207', '--color-primary-gradient-end': '34 211 238' }
   }
 };
 

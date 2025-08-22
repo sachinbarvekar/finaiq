@@ -1,9 +1,9 @@
-
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { Client, ClientStatus, Folder, FolderStatus } from '../types';
 import { MOCK_CLIENTS, MOCK_FOLDERS } from '../constants';
 import ClientFormModal from '../components/clients/ClientFormModal';
 import IntegrationModal from '../components/clients/IntegrationModal';
+import InviteUserModal from '../components/folders/InviteUserModal';
 
 interface ClientContextType {
   clients: Client[];
@@ -17,6 +17,9 @@ interface ClientContextType {
   // Integration Modal
   openIntegrationModal: (client: Client) => void;
   closeIntegrationModal: () => void;
+  // Invite User Modal
+  openInviteModal: () => void;
+  closeInviteModal: () => void;
   // Folder Management
   folders: Folder[];
   getFolderById: (id: string) => Folder | undefined;
@@ -36,6 +39,9 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   // Integration Modal State
   const [isIntegrationModalOpen, setIsIntegrationModalOpen] = useState(false);
   const [clientForIntegration, setClientForIntegration] = useState<Client | null>(null);
+
+  // Invite User Modal State
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   const getClientById = (id: string) => clients.find(c => c.id === id);
   const getFolderById = (id: string) => folders.find(f => f.id === id);
@@ -61,6 +67,10 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setClientForIntegration(null);
     setIsIntegrationModalOpen(false);
   };
+
+  // Invite User Modal Logic
+  const openInviteModal = () => setIsInviteModalOpen(true);
+  const closeInviteModal = () => setIsInviteModalOpen(false);
 
   // Client and Folder Data Logic
   const addClient = (clientData: Omit<Client, 'id' | 'status' | 'accountCreated' | 'lastActivity' | 'monthlyGrowth' | 'folderId' | 'integration' | 'approvedDocs' | 'pendingDocs' | 'rejectedDocs'>) => {
@@ -145,6 +155,8 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     closeFormModal,
     openIntegrationModal,
     closeIntegrationModal,
+    openInviteModal,
+    closeInviteModal,
     folders,
     getFolderById,
     updateFolder,
@@ -164,6 +176,11 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         onClose={closeIntegrationModal}
         onConnect={handleSetIntegration}
         client={clientForIntegration}
+      />
+      <InviteUserModal
+        isOpen={isInviteModalOpen}
+        onClose={closeInviteModal}
+        folders={folders}
       />
     </ClientContext.Provider>
   );

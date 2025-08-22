@@ -34,7 +34,9 @@ export type IconName =
   // New icons for Enterprise Landing Page
   | 'mail' | 'chat-alt' | 'api' | 'shield-check' | 'trending-up' | 'pencil-alt'
   | 'translate' | 'lock-closed' | 'badge-check' | 'server' | 'briefcase'
-  | 'academic-cap' | 'rocket-launch';
+  | 'academic-cap' | 'rocket-launch'
+  // New icons for Invite User modal
+  | 'user-plus' | 'information-circle';
 
 interface IconProps {
   name: IconName;
@@ -114,6 +116,8 @@ const ICONS: Record<IconName, React.ReactNode> = {
   'briefcase': <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.25L21 12m0 0l-1.01-2.021M21 12c0-1.104-.896-2-2-2h-3.375M12 21c-1.104 0-2-.896-2-2v-3.375c0-.923.75-1.625 1.625-1.625h3.375c.923 0 1.625.702 1.625 1.625V19c0 1.104-.896 2-2 2z" transform="translate(-1 -1)" />,
   'academic-cap': <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0l-1.07-1.07a52.5 52.5 0 0117.622-10.43l1.063 1.063m-1.622 12.042a52.5 52.5 0 01-17.622-10.43l1.063-1.063a52.5 52.5 0 0117.622 10.43l-1.063 1.063z" />,
   'rocket-launch': <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56a6 6 0 01-2.82 5.04M7.41 14.37a6 6 0 017.38-5.84v4.82m-7.38 1.02a6 6 0 015.04-2.82M5.63 21a9 9 0 0112.73 0M18.37 3.63a9 9 0 010 12.73M12 3v9" />,
+  'user-plus': <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />,
+  'information-circle': <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
 };
 
 export const Icon: React.FC<IconProps> = ({ name, className }) => {

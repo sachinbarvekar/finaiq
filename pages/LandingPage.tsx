@@ -107,7 +107,7 @@ const LandingPage: React.FC = () => {
                     </p>
                     <div className="flex justify-center space-x-4 mb-12">
                         <Link to="/signup"><Button size="lg">Start AI Processing</Button></Link>
-                        <Link to="/login"><Button size="lg" variant="outline" className="!border-slate-600 !text-white hover:!bg-slate-800">Watch AI Demo</Button></Link>
+                        <Link to="/login"><Button size="lg" variant="outline" className="!border-white !text-white hover:!bg-white/10">Watch AI Demo</Button></Link>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
                         <div className="flex items-center justify-center gap-2 text-sm font-semibold text-slate-200"><Icon name="cpu-chip" className="w-5 h-5" />AI-Powered</div>
@@ -312,7 +312,7 @@ const LandingPage: React.FC = () => {
                     <p className="mt-4 text-lg text-slate-300 max-w-2xl mx-auto mb-8">Join forward-thinking companies using Finaiq AI for intelligent document processing and business automation.</p>
                      <div className="flex justify-center items-center space-x-4">
                         <Link to="/signup"><Button size="lg">Start AI Trial</Button></Link>
-                        <Link to="/login"><Button size="lg" variant='outline' className="!border-slate-300 !text-white hover:!bg-white/10">See AI Demo</Button></Link>
+                        <Link to="/login"><Button size="lg" variant='outline' className="!border-white !text-white hover:!bg-white/10">See AI Demo</Button></Link>
                      </div>
                      <p className="text-xs text-slate-400 mt-4">AI-powered trial • Intelligent onboarding • Expert support</p>
                 </div>

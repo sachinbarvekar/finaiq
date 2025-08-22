@@ -25,9 +25,11 @@ const SignupPage: React.FC = () => {
             <div className="w-full max-w-md">
                 <div className="bg-white rounded-2xl shadow-xl p-8">
                     <div className="text-center mb-8">
-                        <div className="bg-primary w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
-                            <span className="text-white text-2xl font-bold">FQ</span>
-                        </div>
+                        <Link to="/" className="inline-block">
+                            <div className="bg-primary w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
+                                <span className="text-white text-2xl font-bold">FQ</span>
+                            </div>
+                        </Link>
                         <h1 className="text-2xl font-bold text-slate-800">Create Account</h1>
                         <p className="text-slate-500 mt-2 text-sm">Join Finaiq to streamline your document processing</p>
                     </div>
@@ -76,6 +78,11 @@ const SignupPage: React.FC = () => {
                             Sign In
                         </Link>
                     </p>
+                    <div className="text-center mt-4">
+                        <Link to="/" className="text-sm text-slate-500 hover:text-primary hover:underline">
+                            Back to Home
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

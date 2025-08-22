@@ -6,19 +6,21 @@ import NotFound from './NotFound';
 import Button from '../components/ui/Button';
 import { Icon, IconName } from '../components/ui/Icon';
 import DocumentTable from '../components/documents/DocumentTable';
+import DocumentCard from '../components/documents/DocumentCard';
 import { Document, DocumentProcessingStatus, PaymentStatus } from '../types';
 import Pagination from '../components/ui/Pagination';
 
-const DOCUMENTS_PER_PAGE = 5;
+const DOCUMENTS_PER_PAGE = 8;
+type ViewMode = 'list' | 'grid';
 
-const StatCard: React.FC<{ title: string; value: number; icon: IconName; color: string; }> = ({ title, value, icon, color }) => (
-    <div className="bg-white p-5 rounded-2xl shadow-sm flex items-center">
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color}`}>
-            <Icon name={icon} className="w-6 h-6 text-white" />
+const StatCard: React.FC<{ title: string; value: number | string; icon: IconName; color: string }> = ({ title, value, icon, color }) => (
+    <div className="bg-white p-4 rounded-2xl shadow-sm flex items-center">
+        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color}`}>
+            <Icon name={icon} className="w-5 h-5 text-white" />
         </div>
         <div className="ml-4">
             <p className="text-slate-500 text-sm font-medium">{title}</p>
-            <p className="text-2xl font-bold text-slate-800">{value}</p>
+            <p className="text-xl font-bold text-slate-800">{value}</p>
         </div>
     </div>
 );
@@ -26,12 +28,13 @@ const StatCard: React.FC<{ title: string; value: number; icon: IconName; color: 
 const FolderViewPage: React.FC = () => {
   const { folderId } = useParams<{ folderId: string }>();
   const { getFolderById } = useClients();
-  const { getDocumentsByFolderId, openImportModal, openDeleteModal, openEditModal } = useDocuments();
+  const { getDocumentsByFolderId, openImportModal, deleteDocument } = useDocuments();
 
+  // State
   const [searchTerm, setSearchTerm] = useState('');
-  const [processingFilter, setProcessingFilter] = useState<DocumentProcessingStatus | 'All'>('All');
-  const [paymentFilter, setPaymentFilter] = useState<PaymentStatus | 'All'>('All');
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
 
   const folder = folderId ? getFolderById(folderId) : undefined;
   
@@ -42,17 +45,14 @@ const FolderViewPage: React.FC = () => {
   const documents = getDocumentsByFolderId(folder.id);
 
   const filteredDocuments = useMemo(() => {
-    return documents
-      .filter(doc => processingFilter === 'All' || doc.status === processingFilter)
-      .filter(doc => paymentFilter === 'All' || doc.payment === paymentFilter)
-      .filter(doc => {
+    return documents.filter(doc => {
         const search = searchTerm.toLowerCase();
         return (
           doc.supplier.toLowerCase().includes(search) ||
           doc.invoiceNumber.toLowerCase().includes(search)
         );
       });
-  }, [documents, searchTerm, processingFilter, paymentFilter]);
+  }, [documents, searchTerm]);
 
   const paginatedDocuments = useMemo(() => {
     const startIndex = (currentPage - 1) * DOCUMENTS_PER_PAGE;
@@ -61,25 +61,33 @@ const FolderViewPage: React.FC = () => {
 
   const totalPages = Math.ceil(filteredDocuments.length / DOCUMENTS_PER_PAGE);
   
-  const totalDocs = filteredDocuments.length;
-  const readyDocs = filteredDocuments.filter(d => d.status === DocumentProcessingStatus.Ready).length;
-  const errorDocs = filteredDocuments.filter(d => d.status === DocumentProcessingStatus.ExportError).length;
-  const reviewDocs = filteredDocuments.filter(d => d.status === DocumentProcessingStatus.ReviewRequired).length;
+  // Handlers
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedDocuments(filteredDocuments.map(d => d.id));
+    } else {
+      setSelectedDocuments([]);
+    }
+  };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
+  const handleSelectOne = (docId: string) => {
+    setSelectedDocuments(prev => 
+      prev.includes(docId) ? prev.filter(id => id !== docId) : [...prev, docId]
+    );
   };
   
-  const handleProcessingFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setProcessingFilter(e.target.value as DocumentProcessingStatus | 'All');
-    setCurrentPage(1);
-  };
+  const handleBulkDelete = () => {
+    if(window.confirm(`Are you sure you want to delete ${selectedDocuments.length} documents?`)){
+      selectedDocuments.forEach(docId => deleteDocument(docId));
+      setSelectedDocuments([]);
+    }
+  }
 
-  const handlePaymentFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setPaymentFilter(e.target.value as PaymentStatus | 'All');
-    setCurrentPage(1);
-  };
+  // Calculate stats for cards
+  const totalDocuments = documents.length;
+  const readyDocuments = documents.filter(doc => doc.status === DocumentProcessingStatus.Ready).length;
+  const reviewDocuments = documents.filter(doc => doc.status === DocumentProcessingStatus.ReviewRequired).length;
+  const errorDocuments = documents.filter(doc => doc.status === DocumentProcessingStatus.ExportError).length;
 
   return (
     <div>
@@ -93,68 +101,92 @@ const FolderViewPage: React.FC = () => {
             <h1 className="text-3xl font-bold text-slate-800">Folder: {folder.folderName}</h1>
         </div>
         
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <StatCard title="Total Documents" value={totalDocs} icon="document-text" color="bg-blue-500" />
-        <StatCard title="Ready" value={readyDocs} icon="check-circle" color="bg-green-500" />
-        <StatCard title="Export Errors" value={errorDocs} icon="x-circle" color="bg-red-500" />
-        <StatCard title="Review Required" value={reviewDocs} icon="exclamation-circle" color="bg-yellow-500" />
-      </div>
+        {/* Stat Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <StatCard title="Total Documents" value={totalDocuments} icon="document-text" color="bg-blue-500" />
+            <StatCard title="Ready" value={readyDocuments} icon="check-circle" color="bg-green-500" />
+            <StatCard title="Review Required" value={reviewDocuments} icon="exclamation-circle" color="bg-yellow-500" />
+            <StatCard title="Export Errors" value={errorDocuments} icon="x-circle" color="bg-red-500" />
+        </div>
 
-       {/* Search and Filter Controls */}
-      <div className="mb-4 p-4 bg-white rounded-2xl shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="relative">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        {/* Header with Search and View Toggles */}
+        <div className="flex flex-wrap justify-between items-center gap-4 p-4 border-b border-slate-200">
+          <div className="relative flex-grow max-w-md">
              <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
              <input
               type="text"
               placeholder="Search by supplier or invoice..."
               value={searchTerm}
-              onChange={handleSearchChange}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 bg-slate-50 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
-          <div>
-            <select
-              value={processingFilter}
-              onChange={handleProcessingFilterChange}
-              className="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              <option value="All">All Processing Statuses</option>
-              {Object.values(DocumentProcessingStatus).map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </div>
-           <div>
-            <select
-              value={paymentFilter}
-              onChange={handlePaymentFilterChange}
-              className="w-full px-3 py-2 bg-slate-50 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              <option value="All">All Payment Statuses</option>
-              {Object.values(PaymentStatus).map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
+          <div className="flex items-center gap-4">
+            <Button leftIcon={<Icon name="upload" className="w-5 h-5"/>} onClick={() => folder && openImportModal(folder)}>
+              Import Documents
+            </Button>
+            <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg">
+              {(['list', 'grid'] as ViewMode[]).map(mode => (
+                <button
+                  key={mode}
+                  onClick={() => setViewMode(mode)}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${viewMode === mode ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:bg-slate-200'}`}
+                >
+                  <Icon name={`view-${mode}` as 'view-list' | 'view-grid'} className="w-5 h-5"/>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div className="flex flex-wrap justify-between items-center gap-4 p-4 border-b border-slate-200">
-          <div>
-            <h2 className="text-xl font-bold text-slate-800">Documents</h2>
-            <p className="text-sm text-slate-500">{totalDocs} document(s) found</p>
+        {/* Bulk Actions Bar */}
+        {selectedDocuments.length > 0 && (
+          <div className="bg-primary/10 p-3 border-b border-slate-200 flex items-center justify-between">
+            <p className="text-sm font-medium text-primary">{selectedDocuments.length} document(s) selected</p>
+            <div className="flex items-center space-x-2">
+              <Button size="sm" variant="ghost" className="!text-primary" onClick={() => alert('Reprocessing documents...')}>
+                <Icon name="reprocess" className="w-4 h-4 mr-2"/> Reprocess
+              </Button>
+               <Button size="sm" variant="ghost" className="!text-primary" onClick={() => alert('Downloading documents...')}>
+                <Icon name="download" className="w-4 h-4 mr-2"/> Download
+              </Button>
+              <Button size="sm" variant="ghost" className="!text-red-600" onClick={handleBulkDelete}>
+                <Icon name="trash" className="w-4 h-4 mr-2"/> Delete
+              </Button>
+            </div>
           </div>
-          <Button leftIcon={<Icon name="upload" className="w-5 h-5"/>} onClick={() => folder && openImportModal(folder)}>
-            Import Documents
-          </Button>
-        </div>
-        <DocumentTable 
-            documents={paginatedDocuments} 
-            folderId={folder.id}
-            onDelete={(docId) => openDeleteModal(docId)}
-            onDownload={(docId) => alert(`Downloading document ${docId}`)}
-            onReprocess={(docId) => alert(`Reprocessing document ${docId}`)}
-            onEdit={(docId) => openEditModal(docId)}
-        />
+        )}
+
+        {/* Content Area */}
+        {viewMode === 'list' ? (
+          <DocumentTable 
+              documents={paginatedDocuments} 
+              folderId={folder.id}
+              selectedDocuments={selectedDocuments}
+              onSelectAll={handleSelectAll}
+              onSelectOne={handleSelectOne}
+          />
+        ) : (
+          <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {paginatedDocuments.map(doc => (
+              <DocumentCard 
+                key={doc.id} 
+                document={doc}
+                folderId={folder.id}
+                isSelected={selectedDocuments.includes(doc.id)}
+                onSelect={handleSelectOne}
+              />
+            ))}
+          </div>
+        )}
+
+        {paginatedDocuments.length === 0 && (
+           <div className="text-center p-8 text-slate-500">
+              No documents found.
+            </div>
+        )}
+        
         <Pagination 
           currentPage={currentPage}
           totalPages={totalPages}

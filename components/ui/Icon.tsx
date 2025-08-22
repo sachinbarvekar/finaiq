@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export type IconName = 
@@ -41,7 +40,9 @@ export type IconName =
   // New icon for workflows
   | 'switch-horizontal'
   // New icons for mobile drawer
-  | 'menu' | 'x';
+  | 'menu' | 'x'
+  // New icons for folder view
+  | 'view-list' | 'view-grid';
 
 interface IconProps {
   name: IconName;
@@ -126,6 +127,8 @@ const ICONS: Record<IconName, React.ReactNode> = {
   'switch-horizontal': <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />,
   'menu': <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />,
   'x': <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />,
+  'view-list': <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />,
+  'view-grid': <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />,
 };
 
 export const Icon: React.FC<IconProps> = ({ name, className }) => {

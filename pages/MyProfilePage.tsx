@@ -2,17 +2,7 @@
 import React from 'react';
 import { Icon, IconName } from '../components/ui/Icon';
 import Button from '../components/ui/Button';
-
-// Mock admin data
-const adminUser = {
-  name: 'Sagar Agrobeet',
-  email: 'sagar@agrobeet.com',
-  role: 'Administrator',
-  avatarUrl: 'https://picsum.photos/id/237/200/200',
-  phone: '123-456-7890',
-  team: 'Platform Operations',
-  memberSince: '2022-08-22',
-};
+import { useProfile } from '../contexts/ProfileContext';
 
 // Reusable components
 const InfoCard: React.FC<{ title: string; icon?: IconName; children: React.ReactNode; className?: string }> = ({ title, icon, children, className }) => (
@@ -49,6 +39,8 @@ const SettingToggle: React.FC<{ label: string; description: string; enabled: boo
 
 // Main component
 const MyProfilePage: React.FC = () => {
+  const { adminUser, openEditModal } = useProfile();
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -64,7 +56,7 @@ const MyProfilePage: React.FC = () => {
             <p className="text-slate-500">{adminUser.role}</p>
           </div>
         </div>
-        <Button variant="primary" leftIcon={<Icon name="edit" className="w-4 h-4" />}>
+        <Button variant="primary" leftIcon={<Icon name="edit" className="w-4 h-4" />} onClick={openEditModal}>
           Edit Profile
         </Button>
       </div>

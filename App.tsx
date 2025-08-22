@@ -16,6 +16,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { ProfileProvider } from './contexts/ProfileContext';
 
 const App: React.FC = () => {
   return (
@@ -30,18 +31,20 @@ const App: React.FC = () => {
               path="/*"
               element={
                 <ProtectedRoute>
-                  <MainLayout>
-                    <Routes>
-                      <Route path="/" element={<Dashboard />} />
-                      <Route path="/clients" element={<Clients />} />
-                      <Route path="/profile" element={<MyProfilePage />} />
-                      <Route path="/folders" element={<Folders />} />
-                      <Route path="/folders/:folderId" element={<FolderViewPage />} />
-                      <Route path="/folders/:folderId/documents/:documentId" element={<DocumentViewPage />} />
-                      <Route path="/settings" element={<Settings />} />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </MainLayout>
+                  <ProfileProvider>
+                    <MainLayout>
+                      <Routes>
+                        <Route path="/" element={<Dashboard />} />
+                        <Route path="/clients" element={<Clients />} />
+                        <Route path="/profile" element={<MyProfilePage />} />
+                        <Route path="/folders" element={<Folders />} />
+                        <Route path="/folders/:folderId" element={<FolderViewPage />} />
+                        <Route path="/folders/:folderId/documents/:documentId" element={<DocumentViewPage />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </MainLayout>
+                  </ProfileProvider>
                 </ProtectedRoute>
               } 
             />

@@ -1,68 +1,150 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Icon, IconName } from '../components/ui/Icon';
 import {
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
+  Tooltip,
 } from 'recharts';
+import { DocumentProcessingStatus } from '../types';
+import { useProfile } from '../contexts/ProfileContext';
+import { useDocuments } from '../contexts/DocumentContext';
+import { useClients } from '../contexts/ClientContext';
 
 
 // --- Page-specific components ---
+
+const Trend: React.FC<{ value: number }> = ({ value }) => {
+    const isPositive = value >= 0;
+    return (
+        <span className={`flex items-center text-xs font-semibold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+            <Icon name={isPositive ? 'arrow-trending-up' : 'arrow-trending-down'} className="w-4 h-4 mr-1" />
+            {Math.abs(value)}% vs last week
+        </span>
+    );
+};
 
 // 1. Stat Card
 interface StatCardProps {
     title: string;
     value: string;
     icon: IconName;
-    color: string;
+    trend: number;
+    to: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => (
-    <div className="bg-white p-5 rounded-2xl shadow-sm flex items-center">
-        <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${color}`}>
-            <Icon name={icon} className="w-6 h-6 text-white" />
-        </div>
-        <div className="ml-4">
+const StatCard: React.FC<StatCardProps> = ({ title, value, icon, trend, to }) => (
+    <Link to={to} className="bg-white p-5 rounded-2xl shadow-sm flex flex-col justify-between transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+        <div className="flex items-center justify-between">
             <p className="text-slate-500 text-sm font-medium">{title}</p>
-            <p className="text-2xl font-bold text-slate-800">{value}</p>
+            <Icon name={icon} className="w-6 h-6 text-slate-400" />
         </div>
-    </div>
+        <div>
+            <p className="text-3xl font-bold text-slate-800 mt-2">{value}</p>
+            <Trend value={trend} />
+        </div>
+    </Link>
 );
 
-// 2. User Processing Chart
-const userProcessingData = [
-    { name: 'John Smith', docs: 142 },
-    { name: 'Sarah Johnson', docs: 98 },
-    { name: 'Mike Davis', docs: 87 },
-    { name: 'Lisa Wilson', docs: 76 },
-    { name: 'David Brown', docs: 65 },
-    { name: 'Emma Taylor', docs: 45 },
-];
 
-const UserProcessingChart: React.FC = () => {
-    const maxDocs = 160;
+// 2. Weekly Activity Chart (Area Chart)
+const WeeklyActivityChart: React.FC = () => {
+    const weeklyActivityData = [
+      { day: 'Mon', processed: 210 }, { day: 'Tue', processed: 280 },
+      { day: 'Wed', processed: 250 }, { day: 'Thu', processed: 310 },
+      { day: 'Fri', processed: 350 }, { day: 'Sat', processed: 180 },
+      { day: 'Sun', processed: 150 },
+    ];
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-            <h2 className="text-xl font-bold text-slate-800 mb-4">User Document Processing</h2>
-            <div className="space-y-4">
-                {userProcessingData.map(user => (
-                    <div key={user.name} className="flex items-center group">
-                        <span className="text-sm font-medium text-slate-600 w-28 text-right pr-4 truncate">{user.name}</span>
-                        <div className="flex-1 bg-slate-100 rounded-full h-5 relative">
-                            <div
-                                className="bg-primary h-5 rounded-full transition-all duration-500 ease-out"
-                                style={{ width: `${(user.docs / maxDocs) * 100}%` }}
-                            ></div>
-                             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity">{user.docs}</span>
+        <div className="bg-white p-6 rounded-2xl shadow-sm h-full flex flex-col">
+            <h2 className="text-xl font-bold text-slate-800 mb-4">Weekly Processing Activity</h2>
+            <div className="w-full flex-grow">
+                <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={weeklyActivityData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <defs>
+                            <linearGradient id="colorProcessed" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="rgb(var(--color-primary))" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="rgb(var(--color-primary))" stopOpacity={0}/>
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />
+                        <XAxis dataKey="day" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false}/>
+                        <YAxis tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} width={30}/>
+                        <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e0e0e0', borderRadius: '0.5rem' }} cursor={{fill: 'rgba(79, 70, 229, 0.1)'}} />
+                        <Area type="monotone" dataKey="processed" stroke="rgb(var(--color-primary))" fillOpacity={1} fill="url(#colorProcessed)" strokeWidth={2} />
+                    </AreaChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+    );
+};
+
+// 3. Document Processing Funnel
+const DocumentFunnel: React.FC = () => {
+    const funnelData = [
+        { name: 'Ingested', value: 1250, color: 'bg-sky-500' },
+        { name: 'Processed (AI)', value: 1180, color: 'bg-blue-500' },
+        { name: 'Validated', value: 1050, color: 'bg-indigo-500' },
+        { name: 'Exported', value: 980, color: 'bg-purple-500' },
+    ];
+
+    return (
+        <div className="bg-white p-6 rounded-2xl shadow-sm h-full flex flex-col">
+            <h2 className="text-xl font-bold text-slate-800 mb-6">Document Funnel</h2>
+            <div className="flex-grow flex flex-col justify-center space-y-1">
+                {funnelData.map((stage, index) => {
+                    const nextValue = funnelData[index + 1]?.value || 0;
+                    const percentage = index < funnelData.length - 1 ? ((nextValue / stage.value) * 100).toFixed(1) : null;
+                    const widthPercentage = (stage.value / funnelData[0].value) * 100;
+
+                    return (
+                        <div key={stage.name} className="flex flex-col items-center">
+                            <div className="flex items-center w-full">
+                                <div className="flex-grow text-right pr-2">
+                                    <p className="font-semibold text-slate-800 text-sm">{stage.name}</p>
+                                    <p className="text-xs text-slate-500">{stage.value} docs</p>
+                                </div>
+                                <div className={`${stage.color} h-8 rounded`} style={{ width: `${widthPercentage}%` }} />
+                            </div>
+                            {percentage && (
+                                <div className="text-xs text-slate-500 my-1">{percentage}% pass-through</div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
+// 4. Recent Activity
+const RecentActivity: React.FC = () => {
+    const activityData = [
+        { id: 1, type: 'upload', user: 'John Smith', detail: 'uploaded 5 invoices to Innovate Inc.', time: '2m ago', icon: 'upload' as IconName },
+        { id: 2, type: 'approve', user: 'Admin', detail: 'approved INV-2024-007', time: '15m ago', icon: 'check-circle' as IconName },
+        { id: 3, type: 'error', user: 'System', detail: 'failed to export 2 docs for Synergy', time: '1h ago', icon: 'x-circle' as IconName },
+        { id: 4, type: 'new_client', user: 'Admin', detail: 'added a new client: Creative Minds', time: '4h ago', icon: 'user-plus' as IconName },
+    ];
+    
+    return (
+        <div className="bg-white p-6 rounded-2xl shadow-sm h-full flex flex-col">
+            <h2 className="text-xl font-bold text-slate-800 mb-4">Recent Activity</h2>
+            <div className="flex-grow space-y-4 -mx-2 px-2 overflow-y-auto">
+                {activityData.map(item => (
+                    <div key={item.id} className="flex items-start">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 mr-3">
+                            <Icon name={item.icon} className="w-5 h-5 text-slate-500" />
+                        </div>
+                        <div className="flex-grow">
+                            <p className="text-sm text-slate-800">
+                                <span className="font-semibold">{item.user}</span> {item.detail}
+                            </p>
+                            <p className="text-xs text-slate-400 mt-0.5">{item.time}</p>
                         </div>
                     </div>
                 ))}
@@ -71,129 +153,33 @@ const UserProcessingChart: React.FC = () => {
     );
 };
 
-// 3. Document Status Overview (NEW)
-const documentStatusData = [
-  { name: 'Completed', value: 1250 },
-  { name: 'Processing', value: 210 },
-  { name: 'Pending', value: 88 },
-  { name: 'Error', value: 45 },
-];
-const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444']; // green, blue, yellow, red
 
-const DocumentStatusChart: React.FC = () => (
-    <div className="bg-white p-6 rounded-2xl shadow-sm h-full flex flex-col">
-        <h2 className="text-xl font-bold text-slate-800 mb-4">Document Status</h2>
-        <div className="flex-grow w-full h-64">
-             <ResponsiveContainer>
-                <PieChart>
-                    <Pie
-                        data={documentStatusData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={50}
-                        outerRadius={70}
-                        fill="#8884d8"
-                        paddingAngle={5}
-                        dataKey="value"
-                        labelLine={false}
-                    >
-                        {documentStatusData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                    </Pie>
-                    <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e0e0e0', borderRadius: '0.5rem' }}/>
-                    <Legend iconType="circle" wrapperStyle={{fontSize: "14px"}}/>
-                </PieChart>
-            </ResponsiveContainer>
-        </div>
-    </div>
-);
-
-
-// 4. Weekly Activity Chart (NEW)
-const weeklyActivityData = [
-  { day: 'Mon', processed: 210 },
-  { day: 'Tue', processed: 280 },
-  { day: 'Wed', processed: 250 },
-  { day: 'Thu', processed: 310 },
-  { day: 'Fri', processed: 350 },
-  { day: 'Sat', processed: 180 },
-  { day: 'Sun', processed: 150 },
-];
-
-const WeeklyActivityChart: React.FC = () => (
-    <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-        <h2 className="text-xl font-bold text-slate-800 mb-4">Weekly Processing Activity</h2>
-        <div className="w-full h-64">
-            <ResponsiveContainer>
-                <LineChart data={weeklyActivityData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                    <XAxis dataKey="day" tick={{ fill: '#64748b', fontSize: 12 }} />
-                    <YAxis tick={{ fill: '#64748b', fontSize: 12 }}/>
-                    <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e0e0e0', borderRadius: '0.5rem' }} />
-                    <Line type="monotone" dataKey="processed" stroke="#4f46e5" strokeWidth={2} dot={{ r: 4, fill: '#4f46e5' }} activeDot={{ r: 6 }} />
-                </LineChart>
-            </ResponsiveContainer>
-        </div>
-    </div>
-);
-
-// 5. Top Performing Users Leaderboard
-const topUsersData = [
-    { name: 'John Smith', docs: 142 },
-    { name: 'Sarah Johnson', docs: 98 },
-    { name: 'Mike Davis', docs: 87 },
-    { name: 'Lisa Wilson', docs: 76 },
-    { name: 'David Brown', docs: 65 },
-];
-
-const TopUsers: React.FC = () => (
-    <div className="bg-white p-6 rounded-2xl shadow-sm h-full">
-        <h2 className="text-xl font-bold text-slate-800 mb-4">Top Performing Users</h2>
-        <div className="space-y-3">
-            {topUsersData.map((user, index) => (
-                <div key={user.name} className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50">
-                    <div className="flex items-center">
-                        <span className="text-lg font-bold text-slate-400 w-8">{`#${index + 1}`}</span>
-                        <img src={`https://i.pravatar.cc/40?u=${user.name.replace(' ', '')}`} alt={user.name} className="w-10 h-10 rounded-full object-cover mr-3" />
-                        <div>
-                            <p className="font-semibold text-slate-800">{user.name}</p>
-                            <p className="text-xs text-slate-500">Documents processed</p>
-                        </div>
-                    </div>
-                    <div className="text-right">
-                         <p className="font-bold text-lg text-primary">{user.docs}</p>
-                    </div>
-                </div>
-            ))}
-        </div>
-    </div>
-);
-
-
-// 6. Quick Actions
+// 5. Quick Actions
 interface ActionCardProps {
     title: string;
     description: string;
     icon: IconName;
-    color: string;
+    to: string;
 }
-const ActionCard: React.FC<ActionCardProps> = ({ title, description, icon, color }) => (
-    <button className={`p-4 rounded-xl text-left transition-all duration-200 hover:shadow-lg hover:-translate-y-1 ${color}`}>
-        <Icon name={icon} className="w-7 h-7 text-white mb-3" />
-        <h3 className="font-bold text-white">{title}</h3>
-        <p className="text-xs text-white/80">{description}</p>
-    </button>
+const ActionCard: React.FC<ActionCardProps> = ({ title, description, icon, to }) => (
+    <Link to={to} className="flex items-start p-4 rounded-xl transition-all duration-200 bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300">
+        <div className="bg-white p-2 rounded-lg border border-slate-200 mr-4">
+          <Icon name={icon} className="w-6 h-6 text-primary" />
+        </div>
+        <div>
+            <h3 className="font-bold text-slate-800">{title}</h3>
+            <p className="text-xs text-slate-500">{description}</p>
+        </div>
+    </Link>
 );
 
 const QuickActions: React.FC = () => (
-    <div className="bg-white p-6 rounded-2xl shadow-sm col-span-1 lg:col-span-2">
+    <div className="bg-white p-6 rounded-2xl shadow-sm h-full flex flex-col">
         <h2 className="text-xl font-bold text-slate-800 mb-4">Admin Quick Actions</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            <ActionCard title="Manage Documents" description="View all client documents" icon="document-text" color="bg-blue-500 hover:bg-blue-600" />
-            <ActionCard title="User Management" description="Manage client accounts" icon="users" color="bg-indigo-500 hover:bg-indigo-600" />
-            <ActionCard title="Client Settings" description="Configure client preferences" icon="preferences" color="bg-purple-500 hover:bg-purple-600" />
-            <ActionCard title="System Analytics" description="Platform performance insights" icon="chart-bar" color="bg-pink-500 hover:bg-pink-600" />
+        <div className="flex-grow flex flex-col justify-around space-y-3">
+            <ActionCard to="/dashboard/clients" title="Client Management" description="Add, edit, and manage clients" icon="users" />
+            <ActionCard to="/dashboard/settings" title="Settings" description="Configure app preferences" icon="settings" />
+            <ActionCard to="/dashboard/workflows" title="Workflows" description="Automate processing rules" icon="workflow" />
         </div>
     </div>
 );
@@ -202,33 +188,41 @@ const QuickActions: React.FC = () => (
 // --- Main Dashboard Component ---
 
 const Dashboard: React.FC = () => {
+  const { adminUser } = useProfile();
+  const { clients } = useClients();
+  const { documents } = useDocuments();
+  const pendingReviews = documents.filter(d => d.status === DocumentProcessingStatus.ReviewRequired).length;
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-slate-800 mb-6">Dashboard</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-800">Welcome back, {adminUser.name.split(' ')[0]}!</h1>
+        <p className="text-slate-500">Here's your performance summary for this week.</p>
+      </div>
       
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          <StatCard title="Total Folders/Clients" value="24" icon="users" color="bg-blue-500" />
-          <StatCard title="Emails Received" value="1,847" icon="inbox" color="bg-green-500" />
-          <StatCard title="Pending Reviews" value="12" icon="clock" color="bg-yellow-500" />
-          <StatCard title="Accuracy" value="94.5%" icon="target" color="bg-red-500" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatCard to="/dashboard/clients" title="Total Clients" value={String(clients.length)} icon="users" trend={2.5} />
+          <StatCard to="/dashboard/documents?status=all" title="Documents Processed" value={String(documents.length)} icon="document-text" trend={5.2} />
+          <StatCard to={`/dashboard/documents?status=${DocumentProcessingStatus.ReviewRequired}`} title="Pending Reviews" value={String(pendingReviews)} icon="clock" trend={-1.8} />
+          <StatCard to="/dashboard" title="Avg. Accuracy" value="98.7%" icon="target" trend={0.5} />
       </div>
       
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2">
-          <UserProcessingChart />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 h-[400px]">
+            <WeeklyActivityChart />
         </div>
-        <DocumentStatusChart />
-        <div className="lg:col-span-2">
-          <WeeklyActivityChart />
+        <div className="lg:col-span-1 h-[400px]">
+           <DocumentFunnel />
         </div>
-        <TopUsers />
+        <div className="lg:col-span-2 h-[400px]">
+            <RecentActivity />
+        </div>
+         <div className="lg:col-span-1 h-[400px]">
+            <QuickActions />
+        </div>
       </div>
-
-      {/* Quick Actions Section */}
-      <QuickActions />
-
     </div>
   );
 };

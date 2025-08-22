@@ -9,7 +9,7 @@ import DocumentViewSidebar from '../components/documents/DocumentViewSidebar';
 
 const DocumentViewPage: React.FC = () => {
     const { folderId, documentId } = useParams<{ folderId: string, documentId: string }>();
-    const { getDocumentById, openDeleteModal, openEditModal } = useDocuments();
+    const { getDocumentById, openDeleteModal, updateDocument } = useDocuments();
     const navigate = useNavigate();
 
     // UI State
@@ -53,7 +53,6 @@ const DocumentViewPage: React.FC = () => {
                     
                     {/* Action Buttons */}
                     <Button variant="secondary" leftIcon={<Icon name="download" className="w-4 h-4" />}>Download</Button>
-                    <Button variant="primary" leftIcon={<Icon name="edit" className="w-4 h-4" />} onClick={() => openEditModal(document.id)}>Edit</Button>
                      <button
                         onClick={() => setIsPanelOpen(!isPanelOpen)}
                         className="p-2 rounded-md text-slate-500 hover:bg-slate-100 hover:text-primary transition-colors"
@@ -74,10 +73,11 @@ const DocumentViewPage: React.FC = () => {
                 </main>
 
                 {/* --- Details Sidebar --- */}
-                <aside className={`transition-all duration-300 ease-in-out flex-shrink-0 bg-white border-l border-slate-200 ${isPanelOpen ? 'w-80' : 'w-0 overflow-hidden'}`}>
+                <aside className={`transition-all duration-300 ease-in-out flex-shrink-0 bg-white border-l border-slate-200 ${isPanelOpen ? 'w-96' : 'w-0 overflow-hidden'}`}>
                    {isPanelOpen && (
                         <DocumentViewSidebar 
-                            document={document} 
+                            document={document}
+                            onUpdate={updateDocument}
                             onDelete={handleDelete} 
                             onFieldHover={setHighlightedField}
                         />

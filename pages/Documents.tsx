@@ -1,31 +1,13 @@
 
 import React from 'react';
 import { MOCK_DOCUMENTS } from '../constants';
-import { Document as DocType, DocumentProcessingStatus, PaymentStatus } from '../types';
+import { Document as DocType } from '../types';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import { Icon } from '../components/ui/Icon';
 
 const DocumentTable: React.FC<{ documents: DocType[] }> = ({ documents }) => {
     
-    const getProcessingStatusColor = (status: DocumentProcessingStatus): 'green' | 'red' | 'yellow' => {
-        switch(status) {
-            case DocumentProcessingStatus.Ready: return 'green';
-            case DocumentProcessingStatus.ExportError: return 'red';
-            case DocumentProcessingStatus.ReviewRequired: return 'yellow';
-            default: return 'yellow';
-        }
-    }
-
-    const getPaymentStatusColor = (status: PaymentStatus): 'green' | 'red' | 'yellow' => {
-        switch(status) {
-            case PaymentStatus.Paid: return 'green';
-            case PaymentStatus.Overdue: return 'red';
-            case PaymentStatus.Pending: return 'yellow';
-            default: return 'yellow';
-        }
-    }
-
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-GB');
     }
@@ -51,8 +33,8 @@ const DocumentTable: React.FC<{ documents: DocType[] }> = ({ documents }) => {
                     <td className="p-4 text-sm text-slate-600">{doc.invoiceNumber}</td>
                     <td className="p-4 text-sm text-slate-600">{formatDate(doc.date)}</td>
                     <td className="p-4 text-sm text-slate-600">{doc.currency} {doc.amount.toFixed(2)}</td>
-                    <td className="p-4"><Badge color={getProcessingStatusColor(doc.status)}>{doc.status}</Badge></td>
-                    <td className="p-4"><Badge color={getPaymentStatusColor(doc.payment)}>{doc.payment}</Badge></td>
+                    <td className="p-4"><Badge status={doc.status} /></td>
+                    <td className="p-4"><Badge status={doc.payment} /></td>
                     <td className="p-4">
                         <button className="p-2 text-slate-500 hover:text-primary rounded-full hover:bg-slate-100 transition-colors">
                             <Icon name="more" className="w-5 h-5" />

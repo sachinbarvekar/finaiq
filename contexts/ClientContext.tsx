@@ -5,6 +5,8 @@ import { MOCK_CLIENTS, MOCK_FOLDERS } from '../constants';
 import ClientFormModal from '../components/clients/ClientFormModal';
 import IntegrationModal from '../components/clients/IntegrationModal';
 import InviteUserModal from '../components/folders/InviteUserModal';
+import FolderPreferencesModal from '../components/folders/FolderPreferencesModal';
+import ImportSettingsModal from '../components/folders/ImportSettingsModal';
 
 interface ClientContextType {
   clients: Client[];
@@ -25,6 +27,11 @@ interface ClientContextType {
   folders: Folder[];
   getFolderById: (id: string) => Folder | undefined;
   updateFolder: (folderId: string, folderData: Partial<Omit<Folder, 'id'>>) => void;
+  // Folder Modals
+  openPreferencesModal: (folder: Folder) => void;
+  closePreferencesModal: () => void;
+  openImportSettingsModal: (folder: Folder) => void;
+  closeImportSettingsModal: () => void;
 }
 
 const ClientContext = createContext<ClientContextType | undefined>(undefined);
@@ -45,6 +52,10 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [initialFolderId, setInitialFolderId] = useState<string | undefined>(undefined);
 
+  // Folder Modals State
+  const [isPreferencesModalOpen, setIsPreferencesModalOpen] = useState(false);
+  const [isImportSettingsModalOpen, setIsImportSettingsModalOpen] = useState(false);
+  const [folderForModal, setFolderForModal] = useState<Folder | null>(null);
 
   const getClientById = (id: string) => clients.find(c => c.id === id);
   const getFolderById = (id: string) => folders.find(f => f.id === id);
@@ -79,6 +90,26 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const closeInviteModal = () => {
     setInitialFolderId(undefined);
     setIsInviteModalOpen(false);
+  };
+
+  // Folder Preferences Modal Logic
+  const openPreferencesModal = (folder: Folder) => {
+      setFolderForModal(folder);
+      setIsPreferencesModalOpen(true);
+  };
+  const closePreferencesModal = () => {
+      setFolderForModal(null);
+      setIsPreferencesModalOpen(false);
+  };
+
+  // Import Settings Modal Logic
+  const openImportSettingsModal = (folder: Folder) => {
+      setFolderForModal(folder);
+      setIsImportSettingsModalOpen(true);
+  };
+  const closeImportSettingsModal = () => {
+      setFolderForModal(null);
+      setIsImportSettingsModalOpen(false);
   };
 
 
@@ -154,6 +185,10 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     }
     closeIntegrationModal();
   };
+  
+  const handleUpdateFolder = (folderId: string, folderData: Partial<Omit<Folder, 'id'>>) => {
+    updateFolder(folderId, folderData);
+  }
 
   const value = {
     clients,
@@ -170,6 +205,10 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     folders,
     getFolderById,
     updateFolder,
+    openPreferencesModal,
+    closePreferencesModal,
+    openImportSettingsModal,
+    closeImportSettingsModal,
   };
 
   return (
@@ -192,6 +231,17 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         onClose={closeInviteModal}
         folders={folders}
         initialFolderId={initialFolderId}
+      />
+      <FolderPreferencesModal
+        isOpen={isPreferencesModalOpen}
+        onClose={closePreferencesModal}
+        folder={folderForModal}
+        onUpdateFolder={handleUpdateFolder}
+      />
+      <ImportSettingsModal
+        isOpen={isImportSettingsModalOpen}
+        onClose={closeImportSettingsModal}
+        folder={folderForModal}
       />
     </ClientContext.Provider>
   );

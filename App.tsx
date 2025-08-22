@@ -20,6 +20,8 @@ import { ProfileProvider } from './contexts/ProfileContext';
 import LandingPage from './pages/LandingPage';
 import ClientProfilePage from './pages/ClientProfilePage';
 import Workflows from './pages/Workflows';
+import AllDocumentsPage from './pages/AllDocumentsPage';
+import UserProfilePage from './pages/UserProfilePage';
 
 const App: React.FC = () => {
   return (
@@ -42,6 +44,8 @@ const App: React.FC = () => {
                         <Route path="/clients" element={<Clients />} />
                         <Route path="/clients/:clientId" element={<ClientProfilePage />} />
                         <Route path="/profile" element={<MyProfilePage />} />
+                        <Route path="/users/:userId" element={<UserProfilePage />} />
+                        <Route path="/documents" element={<AllDocumentsPage />} />
                         <Route path="/folders" element={<Folders />} />
                         <Route path="/folders/:folderId" element={<FolderViewPage />} />
                         <Route path="/folders/:folderId/documents/:documentId" element={<DocumentViewPage />} />

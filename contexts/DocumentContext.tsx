@@ -1,11 +1,10 @@
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { Document, Folder } from '../types';
+import { Document, Folder, DocumentProcessingStatus } from '../types';
 import { MOCK_DOCUMENTS } from '../constants';
 import { useClients } from './ClientContext';
 import ImportDocumentsModal from '../components/documents/ImportDocumentsModal';
 import ConfirmModal from '../components/ui/ConfirmModal';
-import EditDocumentModal from '../components/documents/EditDocumentModal';
 
 interface DocumentContextType {
   documents: Document[];
@@ -14,6 +13,7 @@ interface DocumentContextType {
   addDocument: (docData: Omit<Document, 'id' | 'folderId'>, folderId: string) => void;
   updateDocument: (docId: string, docData: Partial<Omit<Document, 'id'>>) => void;
   deleteDocument: (docId: string) => void;
+  reprocessDocuments: (docIds: string[]) => void;
   openImportModal: (folder: Folder) => void;
   openDeleteModal: (docId: string, onSuccess?: () => void) => void;
   openEditModal: (docId: string) => void;
@@ -31,8 +31,12 @@ export const DocumentProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [docToDelete, setDocToDelete] = useState<Document | null>(null);
   const [onDeleteSuccess, setOnDeleteSuccess] = useState<(() => void) | null>(null);
+  
+  // NOTE: Edit modal is being replaced by inline editing in the sidebar,
+  // but we keep the functions for now to avoid breaking components that haven't been updated.
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [docToEdit, setDocToEdit] = useState<Document | null>(null);
+
 
   const getDocumentsByFolderId = (folderId: string) => {
     return documents.filter(doc => doc.folderId === folderId);
@@ -72,6 +76,24 @@ export const DocumentProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   };
 
+  const reprocessDocuments = (docIds: string[]) => {
+    // Set status to 'Processing' for immediate feedback
+    setDocuments(prevDocs =>
+      prevDocs.map(doc =>
+        docIds.includes(doc.id) ? { ...doc, status: DocumentProcessingStatus.Processing } : doc
+      )
+    );
+
+    // Simulate API call and then set to 'Review Required'
+    setTimeout(() => {
+      setDocuments(prevDocs =>
+        prevDocs.map(doc =>
+          docIds.includes(doc.id) ? { ...doc, status: DocumentProcessingStatus.ReviewRequired } : doc
+        )
+      );
+    }, 2000);
+  };
+
   // Modal handlers
   const openImportModal = (folder: Folder) => {
     setTargetFolder(folder);
@@ -99,16 +121,8 @@ export const DocumentProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
   
   const openEditModal = (docId: string) => {
-    const doc = documents.find(d => d.id === docId);
-    if (doc) {
-        setDocToEdit(doc);
-        setIsEditModalOpen(true);
-    }
-  };
-
-  const closeEditModal = () => {
-      setDocToEdit(null);
-      setIsEditModalOpen(false);
+    // This function is now a stub, inline editing is preferred.
+    console.warn("openEditModal is deprecated. Use inline editing in DocumentViewSidebar.");
   };
 
   const handleConfirmDelete = () => {
@@ -128,6 +142,7 @@ export const DocumentProvider: React.FC<{ children: ReactNode }> = ({ children }
     addDocument,
     updateDocument,
     deleteDocument,
+    reprocessDocuments,
     openImportModal,
     openDeleteModal,
     openEditModal,
@@ -148,17 +163,6 @@ export const DocumentProvider: React.FC<{ children: ReactNode }> = ({ children }
             onConfirm={handleConfirmDelete}
             title="Delete Document"
             message={`Are you sure you want to delete invoice "${docToDelete.invoiceNumber}"? This action cannot be undone.`}
-        />
-      )}
-      {docToEdit && (
-        <EditDocumentModal
-          isOpen={isEditModalOpen}
-          onClose={closeEditModal}
-          onSubmit={(data) => {
-            updateDocument(docToEdit.id, data);
-            closeEditModal();
-          }}
-          documentToEdit={docToEdit}
         />
       )}
     </DocumentContext.Provider>

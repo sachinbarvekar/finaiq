@@ -42,6 +42,7 @@ export enum DocumentProcessingStatus {
   Ready = 'Ready',
   ExportError = 'Export Error',
   ReviewRequired = 'Review Required',
+  Processing = 'Processing',
 }
 
 export enum PaymentStatus {

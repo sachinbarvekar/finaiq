@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useClients } from '../contexts/ClientContext';
@@ -7,11 +8,12 @@ import Button from '../components/ui/Button';
 import { Icon, IconName } from '../components/ui/Icon';
 import DocumentTable from '../components/documents/DocumentTable';
 import DocumentCard from '../components/documents/DocumentCard';
+import DocumentBoard from '../components/documents/DocumentBoard';
 import { Document, DocumentProcessingStatus, PaymentStatus } from '../types';
 import Pagination from '../components/ui/Pagination';
 
 const DOCUMENTS_PER_PAGE = 8;
-type ViewMode = 'list' | 'grid';
+type ViewMode = 'list' | 'grid' | 'board';
 
 const StatCard: React.FC<{ title: string; value: number | string; icon: IconName; color: string }> = ({ title, value, icon, color }) => (
     <div className="bg-white p-4 rounded-2xl shadow-sm flex items-center">
@@ -28,7 +30,7 @@ const StatCard: React.FC<{ title: string; value: number | string; icon: IconName
 const FolderViewPage: React.FC = () => {
   const { folderId } = useParams<{ folderId: string }>();
   const { getFolderById } = useClients();
-  const { getDocumentsByFolderId, openImportModal, deleteDocument } = useDocuments();
+  const { getDocumentsByFolderId, openImportModal, reprocessDocuments, openDeleteModal, openEditModal, updateDocument } = useDocuments();
 
   // State
   const [searchTerm, setSearchTerm] = useState('');
@@ -64,7 +66,7 @@ const FolderViewPage: React.FC = () => {
   // Handlers
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedDocuments(filteredDocuments.map(d => d.id));
+      setSelectedDocuments(paginatedDocuments.map(d => d.id));
     } else {
       setSelectedDocuments([]);
     }
@@ -78,16 +80,62 @@ const FolderViewPage: React.FC = () => {
   
   const handleBulkDelete = () => {
     if(window.confirm(`Are you sure you want to delete ${selectedDocuments.length} documents?`)){
-      selectedDocuments.forEach(docId => deleteDocument(docId));
+      selectedDocuments.forEach(docId => openDeleteModal(docId));
       setSelectedDocuments([]);
     }
   }
+  
+  const handleBulkReprocess = () => {
+    reprocessDocuments(selectedDocuments);
+    setSelectedDocuments([]);
+  }
+
+  const handleDocumentDrop = (docId: string, newStatus: DocumentProcessingStatus) => {
+    updateDocument(docId, { status: newStatus });
+  };
 
   // Calculate stats for cards
   const totalDocuments = documents.length;
   const readyDocuments = documents.filter(doc => doc.status === DocumentProcessingStatus.Ready).length;
   const reviewDocuments = documents.filter(doc => doc.status === DocumentProcessingStatus.ReviewRequired).length;
   const errorDocuments = documents.filter(doc => doc.status === DocumentProcessingStatus.ExportError).length;
+
+  const renderContent = () => {
+    switch(viewMode) {
+      case 'list':
+        return (
+          <DocumentTable 
+              documents={paginatedDocuments} 
+              folderId={folder.id}
+              selectedDocuments={selectedDocuments}
+              onSelectAll={handleSelectAll}
+              onSelectOne={handleSelectOne}
+              onEdit={openEditModal}
+              onDelete={openDeleteModal}
+              onReprocess={(docId) => reprocessDocuments([docId])}
+          />
+        );
+      case 'grid':
+        return (
+          <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {paginatedDocuments.map(doc => (
+              <DocumentCard 
+                key={doc.id} 
+                document={doc}
+                folderId={folder.id}
+                isSelected={selectedDocuments.includes(doc.id)}
+                onSelect={handleSelectOne}
+                onEdit={openEditModal}
+                onDelete={openDeleteModal}
+                onReprocess={reprocessDocuments}
+              />
+            ))}
+          </div>
+        );
+      case 'board':
+        return <DocumentBoard documents={filteredDocuments} onDocumentDrop={handleDocumentDrop} />
+    }
+  }
 
   return (
     <div>
@@ -127,13 +175,13 @@ const FolderViewPage: React.FC = () => {
               Import Documents
             </Button>
             <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg">
-              {(['list', 'grid'] as ViewMode[]).map(mode => (
+              {(['list', 'grid', 'board'] as ViewMode[]).map(mode => (
                 <button
                   key={mode}
                   onClick={() => setViewMode(mode)}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${viewMode === mode ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:bg-slate-200'}`}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors capitalize ${viewMode === mode ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:bg-slate-200'}`}
                 >
-                  <Icon name={`view-${mode}` as 'view-list' | 'view-grid'} className="w-5 h-5"/>
+                  <Icon name={`view-${mode}` as IconName} className="w-5 h-5"/>
                 </button>
               ))}
             </div>
@@ -141,11 +189,11 @@ const FolderViewPage: React.FC = () => {
         </div>
 
         {/* Bulk Actions Bar */}
-        {selectedDocuments.length > 0 && (
+        {selectedDocuments.length > 0 && viewMode !== 'board' && (
           <div className="bg-primary/10 p-3 border-b border-slate-200 flex items-center justify-between">
             <p className="text-sm font-medium text-primary">{selectedDocuments.length} document(s) selected</p>
             <div className="flex items-center space-x-2">
-              <Button size="sm" variant="ghost" className="!text-primary" onClick={() => alert('Reprocessing documents...')}>
+              <Button size="sm" variant="ghost" className="!text-primary" onClick={handleBulkReprocess}>
                 <Icon name="reprocess" className="w-4 h-4 mr-2"/> Reprocess
               </Button>
                <Button size="sm" variant="ghost" className="!text-primary" onClick={() => alert('Downloading documents...')}>
@@ -159,39 +207,21 @@ const FolderViewPage: React.FC = () => {
         )}
 
         {/* Content Area */}
-        {viewMode === 'list' ? (
-          <DocumentTable 
-              documents={paginatedDocuments} 
-              folderId={folder.id}
-              selectedDocuments={selectedDocuments}
-              onSelectAll={handleSelectAll}
-              onSelectOne={handleSelectOne}
-          />
-        ) : (
-          <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {paginatedDocuments.map(doc => (
-              <DocumentCard 
-                key={doc.id} 
-                document={doc}
-                folderId={folder.id}
-                isSelected={selectedDocuments.includes(doc.id)}
-                onSelect={handleSelectOne}
-              />
-            ))}
-          </div>
-        )}
+        {renderContent()}
 
-        {paginatedDocuments.length === 0 && (
+        {(viewMode !== 'board' && paginatedDocuments.length === 0) && (
            <div className="text-center p-8 text-slate-500">
               No documents found.
             </div>
         )}
         
-        <Pagination 
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+        {viewMode !== 'board' && (
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
     </div>
   );

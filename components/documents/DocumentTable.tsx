@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Document, DocumentProcessingStatus, PaymentStatus } from '../../types';
-import { Icon, IconName } from '../ui/Icon';
+import { Document } from '../../types';
+import { Icon } from '../ui/Icon';
 import Badge from '../ui/Badge';
 
 const ActionMenu: React.FC<{ 
     doc: Document; 
     folderId: string;
-}> = ({ doc, folderId }) => {
+    onEdit: (docId: string) => void;
+    onDelete: (docId: string) => void;
+    onReprocess: (docId: string) => void;
+}> = ({ doc, folderId, onEdit, onDelete, onReprocess }) => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
@@ -43,10 +46,10 @@ const ActionMenu: React.FC<{
             {isOpen && (
                 <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10 p-1">
                     <button onClick={(e) => handleActionClick(e, () => navigate(`/dashboard/folders/${folderId}/documents/${doc.id}`))} className="flex items-center w-full px-3 py-2 text-sm text-left text-slate-700 hover:bg-slate-100 rounded-md"><Icon name="view" className="w-4 h-4 mr-2"/>View</button>
-                    <button onClick={(e) => handleActionClick(e, () => alert('Edit'))} className="flex items-center w-full px-3 py-2 text-sm text-left text-slate-700 hover:bg-slate-100 rounded-md"><Icon name="edit" className="w-4 h-4 mr-2"/>Edit</button>
-                    <button onClick={(e) => handleActionClick(e, () => alert('Download'))} className="flex items-center w-full px-3 py-2 text-sm text-left text-slate-700 hover:bg-slate-100 rounded-md"><Icon name="download" className="w-4 h-4 mr-2"/>Download</button>
+                    <button onClick={(e) => handleActionClick(e, () => onEdit(doc.id))} className="flex items-center w-full px-3 py-2 text-sm text-left text-slate-700 hover:bg-slate-100 rounded-md"><Icon name="edit" className="w-4 h-4 mr-2"/>Edit</button>
+                    <button onClick={(e) => handleActionClick(e, () => onReprocess(doc.id))} className="flex items-center w-full px-3 py-2 text-sm text-left text-slate-700 hover:bg-slate-100 rounded-md"><Icon name="reprocess" className="w-4 h-4 mr-2"/>Reprocess</button>
                     <div className="border-t border-slate-100 my-1"></div>
-                    <button onClick={(e) => handleActionClick(e, () => alert('Delete'))} className="flex items-center w-full px-3 py-2 text-sm text-left text-red-600 hover:bg-red-50 rounded-md"><Icon name="trash" className="w-4 h-4 mr-2"/>Delete</button>
+                    <button onClick={(e) => handleActionClick(e, () => onDelete(doc.id))} className="flex items-center w-full px-3 py-2 text-sm text-left text-red-600 hover:bg-red-50 rounded-md"><Icon name="trash" className="w-4 h-4 mr-2"/>Delete</button>
                 </div>
             )}
         </div>
@@ -60,13 +63,14 @@ interface DocumentTableProps {
   selectedDocuments: string[];
   onSelectAll: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSelectOne: (docId: string) => void;
+  onEdit: (docId: string) => void;
+  onDelete: (docId: string) => void;
+  onReprocess: (docId: string) => void;
 }
 
-const DocumentTable: React.FC<DocumentTableProps> = ({ documents, folderId, selectedDocuments, onSelectAll, onSelectOne }) => {
+const DocumentTable: React.FC<DocumentTableProps> = ({ documents, folderId, selectedDocuments, onSelectAll, onSelectOne, onEdit, onDelete, onReprocess }) => {
     const navigate = useNavigate();
     const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('en-GB');
-    const getProcessingStatusColor = (status: DocumentProcessingStatus) => status === 'Ready' ? 'green' : status === 'Export Error' ? 'red' : 'yellow';
-    const getPaymentStatusColor = (status: PaymentStatus) => status === 'Paid' ? 'green' : status === 'Overdue' ? 'red' : 'yellow';
 
     return (
         <div className="overflow-x-auto">
@@ -98,11 +102,11 @@ const DocumentTable: React.FC<DocumentTableProps> = ({ documents, folderId, sele
                         <td className="p-4 text-sm text-slate-800 font-medium">{doc.supplier}</td>
                         <td className="p-4 text-sm text-slate-600">{doc.invoiceNumber}</td>
                         <td className="p-4 text-sm text-slate-600 font-mono">{doc.currency} {doc.amount.toFixed(2)}</td>
-                        <td className="p-4"><Badge color={getProcessingStatusColor(doc.status)}>{doc.status}</Badge></td>
-                        <td className="p-4"><Badge color={getPaymentStatusColor(doc.payment)}>{doc.payment}</Badge></td>
+                        <td className="p-4"><Badge status={doc.status} /></td>
+                        <td className="p-4"><Badge status={doc.payment} /></td>
                         <td className="p-4 text-sm text-slate-600">{formatDate(doc.dueDate)}</td>
                         <td className="p-4 text-center">
-                            <ActionMenu doc={doc} folderId={folderId} />
+                            <ActionMenu doc={doc} folderId={folderId} onEdit={onEdit} onDelete={onDelete} onReprocess={onReprocess} />
                         </td>
                     </tr>
                 ))}

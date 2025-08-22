@@ -7,8 +7,17 @@ interface BadgeProps {
   status: Status;
 }
 
+interface StatusConfig {
+  label: string;
+  color: string;
+  pulse?: boolean;
+}
+
 const Badge: React.FC<BadgeProps> = ({ status }) => {
-  const statusConfig: Record<Status, { label: string; color: string; pulse?: boolean }> = {
+  // By using Record<string, StatusConfig> we can handle cases where different enums
+  // share the same string value (e.g., ClientStatus.Active and FolderStatus.Active are both 'Active').
+  // This avoids TypeScript errors about missing keys when using a stricter Record<Status, ...> type.
+  const statusConfig: Record<string, StatusConfig> = {
     // Document Processing
     [DocumentProcessingStatus.Ready]: { label: 'Ready', color: 'bg-green-100 text-green-800' },
     [DocumentProcessingStatus.ExportError]: { label: 'Export Error', color: 'bg-red-100 text-red-800' },
@@ -18,8 +27,7 @@ const Badge: React.FC<BadgeProps> = ({ status }) => {
     [PaymentStatus.Paid]: { label: 'Paid', color: 'bg-green-100 text-green-800' },
     [PaymentStatus.Pending]: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
     [PaymentStatus.Overdue]: { label: 'Overdue', color: 'bg-red-100 text-red-800' },
-    // Client & Folder Statuses
-    // ClientStatus.Active and FolderStatus.Active are both 'Active'
+    // Client & Folder Statuses (FolderStatus.Active is covered by ClientStatus.Active)
     [ClientStatus.Active]: { label: 'Active', color: 'bg-green-100 text-green-800' },
     [ClientStatus.Inactive]: { label: 'Inactive', color: 'bg-slate-200 text-slate-700' },
     [FolderStatus.Archived]: { label: 'Archived', color: 'bg-slate-200 text-slate-700' },

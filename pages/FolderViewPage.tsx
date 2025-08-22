@@ -84,7 +84,7 @@ const FolderViewPage: React.FC = () => {
   return (
     <div>
        <div className="mb-6">
-            <Link to="/folders" className="text-sm text-primary hover:underline flex items-center">
+            <Link to="/dashboard/folders" className="text-sm text-primary hover:underline flex items-center">
                 <Icon name="chevron-left" className="w-4 h-4 mr-1" />
                 Back to Folders
             </Link>

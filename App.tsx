@@ -18,6 +18,7 @@ import SignupPage from './pages/SignupPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { ProfileProvider } from './contexts/ProfileContext';
 import LandingPage from './pages/LandingPage';
+import ClientProfilePage from './pages/ClientProfilePage';
 
 const App: React.FC = () => {
   return (
@@ -38,6 +39,7 @@ const App: React.FC = () => {
                       <Routes>
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/clients" element={<Clients />} />
+                        <Route path="/clients/:clientId" element={<ClientProfilePage />} />
                         <Route path="/profile" element={<MyProfilePage />} />
                         <Route path="/folders" element={<Folders />} />
                         <Route path="/folders/:folderId" element={<FolderViewPage />} />

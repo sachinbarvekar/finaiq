@@ -169,7 +169,7 @@ const DocumentViewPage: React.FC = () => {
 
     const handleDelete = () => {
         openDeleteModal(document.id);
-        navigate(`/folders/${folderId}`);
+        navigate(`/dashboard/folders/${folderId}`);
     };
 
     return (
@@ -177,7 +177,7 @@ const DocumentViewPage: React.FC = () => {
             {/* --- Header --- */}
             <header className="flex items-center justify-between p-3 border-b border-slate-200 flex-shrink-0">
                 <div>
-                    <Link to={`/folders/${folderId}`} className="text-sm text-primary hover:underline flex items-center">
+                    <Link to={`/dashboard/folders/${folderId}`} className="text-sm text-primary hover:underline flex items-center">
                         <Icon name="chevron-left" className="w-4 h-4 mr-1" />
                         <span>Back to Documents</span>
                     </Link>

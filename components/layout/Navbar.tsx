@@ -99,11 +99,11 @@ const Navbar: React.FC = () => {
           </button>
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-1 z-10">
-              <Link to="/profile" onClick={() => setDropdownOpen(false)} className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+              <Link to="/dashboard/profile" onClick={() => setDropdownOpen(false)} className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
                 <Icon name="user-circle" className="w-5 h-5 mr-3 text-slate-400" />
                 <span>Your Profile</span>
               </Link>
-              <Link to="/settings" onClick={() => setDropdownOpen(false)} className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+              <Link to="/dashboard/settings" onClick={() => setDropdownOpen(false)} className="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
                 <Icon name="preferences" className="w-5 h-5 mr-3 text-slate-400" />
                 <span>Settings</span>
               </Link>

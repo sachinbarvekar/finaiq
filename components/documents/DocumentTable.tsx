@@ -86,7 +86,7 @@ const ActionMenu: React.FC<{
             {isOpen && (
                 <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                     <div className="py-1" role="menu" aria-orientation="vertical">
-                        <ActionMenuItem label="View Document" icon="view" onClick={() => handleAction(() => navigate(`/folders/${folderId}/documents/${doc.id}`))} />
+                        <ActionMenuItem label="View Document" icon="view" onClick={() => handleAction(() => navigate(`/dashboard/folders/${folderId}/documents/${doc.id}`))} />
                         <ActionMenuItem label="Download Document" icon="download" onClick={() => handleAction(() => onDownload(doc.id))} />
                         <ActionMenuItem label="Reprocess Invoice" icon="reprocess" onClick={() => handleAction(() => onReprocess(doc.id))} />
                         <ActionMenuItem label="Edit Details" icon="edit" onClick={() => handleAction(() => onEdit(doc.id))} />
@@ -137,7 +137,7 @@ const DocumentTable: React.FC<DocumentTableProps> = ({ documents, folderId, onDe
                     <tr 
                         key={doc.id} 
                         className="border-b border-slate-200 last:border-b-0 hover:bg-slate-50 transition-colors cursor-pointer"
-                        onClick={() => navigate(`/folders/${folderId}/documents/${doc.id}`)}
+                        onClick={() => navigate(`/dashboard/folders/${folderId}/documents/${doc.id}`)}
                     >
                         <td className="p-4 text-sm text-slate-600 font-medium text-center">{(index + 1)}</td>
                         <td className="p-4 text-sm text-slate-800 font-medium">{doc.supplier}</td>

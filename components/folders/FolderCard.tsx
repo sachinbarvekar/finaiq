@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Folder, FolderStatus } from '../../types';
@@ -40,7 +39,7 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder }) => {
   };
 
   return (
-    <Link to={`/folders/${folder.id}`} className="block h-full">
+    <Link to={`/dashboard/folders/${folder.id}`} className="block h-full">
         <div className="bg-white rounded-2xl shadow-sm p-5 flex flex-col h-full transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
           <div className="flex items-start justify-between mb-4">
             <Icon name="folder" className="w-10 h-10 text-primary opacity-70" />

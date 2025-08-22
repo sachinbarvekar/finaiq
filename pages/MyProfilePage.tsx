@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Icon, IconName } from '../components/ui/Icon';
 import Button from '../components/ui/Button';
@@ -14,30 +15,33 @@ const adminUser = {
 };
 
 // Reusable components
-const InfoCard: React.FC<{ title: string; icon: IconName; children: React.ReactNode; }> = ({ title, icon, children }) => (
-    <div className="bg-white p-6 rounded-2xl shadow-sm">
+const InfoCard: React.FC<{ title: string; icon?: IconName; children: React.ReactNode; className?: string }> = ({ title, icon, children, className }) => (
+    <div className={`bg-white p-6 rounded-2xl shadow-sm ${className}`}>
         <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center">
-            <Icon name={icon} className="w-5 h-5 mr-3 text-primary" />
+            {icon && <Icon name={icon} className="w-5 h-5 mr-3 text-primary" />}
             {title}
         </h2>
         {children}
     </div>
 );
 
-const InfoItem: React.FC<{ label: string; value: string; }> = ({ label, value }) => (
-    <div>
-        <p className="text-sm text-slate-500">{label}</p>
-        <p className="font-medium text-slate-800">{value}</p>
+const InfoItem: React.FC<{ label: string; value: string; icon: IconName }> = ({ label, value, icon }) => (
+    <div className="flex items-start">
+        <Icon name={icon} className="w-5 h-5 text-slate-400 mt-1 mr-4 flex-shrink-0" />
+        <div>
+            <p className="text-sm text-slate-500">{label}</p>
+            <p className="font-medium text-slate-800">{value}</p>
+        </div>
     </div>
 );
 
 const SettingToggle: React.FC<{ label: string; description: string; enabled: boolean; }> = ({ label, description, enabled }) => (
-    <div className="flex items-center justify-between py-2">
+    <div className="flex items-center justify-between py-3">
         <div>
             <p className="font-medium text-slate-800">{label}</p>
             <p className="text-sm text-slate-500">{description}</p>
         </div>
-        <div className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${enabled ? 'bg-primary' : 'bg-slate-300'}`}>
+        <div className={`relative w-12 h-6 rounded-full p-1 transition-colors duration-300 cursor-pointer ${enabled ? 'bg-primary' : 'bg-slate-300'}`}>
             <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${enabled ? 'translate-x-6' : ''}`} />
         </div>
     </div>
@@ -48,7 +52,7 @@ const MyProfilePage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-2xl shadow-sm p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="bg-white rounded-2xl shadow-sm p-6 flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="flex items-center">
           <img
             src={adminUser.avatarUrl}
@@ -68,30 +72,34 @@ const MyProfilePage: React.FC = () => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
-          <InfoCard title="Profile Information" icon="user-circle">
+          <InfoCard title="About Me" icon="user-circle">
             <div className="space-y-4">
-              <InfoItem label="Full Name" value={adminUser.name} />
-              <InfoItem label="Email Address" value={adminUser.email} />
-              <InfoItem label="Phone Number" value={adminUser.phone} />
-              <InfoItem label="Team" value={adminUser.team} />
-              <InfoItem label="Member Since" value={new Date(adminUser.memberSince).toLocaleDateString()} />
+              <InfoItem label="Email Address" value={adminUser.email} icon="inbox" />
+              <InfoItem label="Phone Number" value={adminUser.phone} icon="phone" />
+              <InfoItem label="Team" value={adminUser.team} icon="users" />
+              <InfoItem label="Member Since" value={new Date(adminUser.memberSince).toLocaleDateString()} icon="calendar"/>
             </div>
           </InfoCard>
         </div>
         <div className="lg:col-span-2 space-y-6">
-          <InfoCard title="Security Settings" icon="settings">
-            <div className="space-y-4">
-                <Button variant="outline" className="w-full sm:w-auto">Change Password</Button>
-                <div className="border-t border-slate-200 my-4"></div>
+          <InfoCard title="Security" icon="settings">
+            <div className="divide-y divide-slate-200">
                  <SettingToggle 
                     label="Two-Factor Authentication (2FA)"
-                    description="Enhance your account security."
+                    description="Enhance your account security with 2FA."
                     enabled={true}
                 />
+                 <div className="py-3 flex items-center justify-between">
+                    <div>
+                         <p className="font-medium text-slate-800">Password</p>
+                         <p className="text-sm text-slate-500">Last changed 3 months ago.</p>
+                    </div>
+                    <Button variant="outline" size="sm">Change Password</Button>
+                 </div>
             </div>
           </InfoCard>
 
-          <InfoCard title="Notification Preferences" icon="bell">
+          <InfoCard title="Notifications" icon="bell">
              <div className="divide-y divide-slate-200">
                 <SettingToggle 
                     label="Email Notifications"

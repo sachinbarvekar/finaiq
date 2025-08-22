@@ -36,8 +36,7 @@ const ClientTable: React.FC<ClientTableProps> = ({ clients, onEdit, onDelete }) 
             clients.map((client) => (
               <tr 
                 key={client.id} 
-                className="border-b border-slate-200 last:border-b-0 hover:bg-slate-50 transition-colors cursor-pointer group"
-                onClick={() => navigate(`/clients/${client.id}`)}
+                className="border-b border-slate-200 last:border-b-0 hover:bg-slate-50 transition-colors group"
               >
                 <td className="p-4 text-sm text-slate-800 font-medium">{client.companyName}</td>
                 <td className="p-4 text-sm text-slate-600">{client.contactName}</td>
@@ -50,13 +49,6 @@ const ClientTable: React.FC<ClientTableProps> = ({ clients, onEdit, onDelete }) 
                 </td>
                 <td className="p-4">
                   <div className="flex items-center justify-end space-x-0 sm:space-x-2">
-                    <button 
-                      onClick={(e) => handleActionClick(e, () => navigate(`/clients/${client.id}`))} 
-                      className="p-2 text-slate-500 hover:text-primary rounded-full hover:bg-slate-100 transition-colors" 
-                      aria-label={`View ${client.companyName}`}
-                    >
-                        <Icon name="view" className="w-5 h-5" />
-                    </button>
                     <button 
                       onClick={(e) => handleActionClick(e, () => onEdit(client.id))} 
                       className="p-2 text-slate-500 hover:text-green-600 rounded-full hover:bg-slate-100 transition-colors" 

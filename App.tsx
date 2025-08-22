@@ -4,7 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
 import Dashboard from './pages/Dashboard';
 import Clients from './pages/Clients';
-import ClientProfilePage from './pages/ClientProfilePage';
+import MyProfilePage from './pages/MyProfilePage';
 import Folders from './pages/Folders';
 import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
@@ -34,7 +34,7 @@ const App: React.FC = () => {
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/clients" element={<Clients />} />
-                      <Route path="/clients/:clientId" element={<ClientProfilePage />} />
+                      <Route path="/profile" element={<MyProfilePage />} />
                       <Route path="/folders" element={<Folders />} />
                       <Route path="/folders/:folderId" element={<FolderViewPage />} />
                       <Route path="/folders/:folderId/documents/:documentId" element={<DocumentViewPage />} />

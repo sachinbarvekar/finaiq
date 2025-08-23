@@ -181,7 +181,7 @@ const FolderViewPage: React.FC = () => {
                   onClick={() => setViewMode(mode)}
                   className={`px-3 py-1 rounded-md text-sm font-medium transition-colors capitalize ${viewMode === mode ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:bg-slate-200'}`}
                 >
-                  <Icon name={`view-${mode}` as IconName} className="w-5 h-5"/>
+                  <Icon name={mode === 'board' ? 'view-boards' : `view-${mode}` as IconName} className="w-5 h-5"/>
                 </button>
               ))}
             </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Document } from '../../types';
@@ -57,6 +56,7 @@ const ActionMenu: React.FC<{
 interface DocumentCardProps {
   document: Document;
   folderId?: string;
+  clientName?: string; // New optional prop
   isSelected?: boolean;
   onSelect?: (docId: string) => void;
   onEdit?: (docId: string) => void;
@@ -64,7 +64,7 @@ interface DocumentCardProps {
   onReprocess?: (docIds: string[]) => void;
 }
 
-const DocumentCard: React.FC<DocumentCardProps> = ({ document, folderId, isSelected, onSelect, onEdit, onDelete, onReprocess }) => {
+const DocumentCard: React.FC<DocumentCardProps> = ({ document, folderId, clientName, isSelected, onSelect, onEdit, onDelete, onReprocess }) => {
   const navigate = useNavigate();
   const [isDragging, setIsDragging] = useState(false);
 
@@ -95,7 +95,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, folderId, isSelec
       onDragEnd={handleDragEnd}
       className={`bg-white rounded-2xl shadow-sm border-2 flex flex-col transition-all duration-200 cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-50 ring-2 ring-primary' : ''} ${isSelected ? 'border-primary shadow-lg' : 'border-slate-200 hover:border-slate-300 hover:shadow-md'}`}
     >
-      <div className="p-4" onClick={handleCardClick}>
+      <div className="p-4 flex-grow" onClick={handleCardClick}>
         <div className="flex justify-between items-start mb-3">
           <div className="flex items-center" onClick={onSelect ? handleCheckboxClick : undefined}>
             {onSelect && <input
@@ -113,9 +113,15 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, folderId, isSelec
             {document.supplier}
           </p>
           <p className="text-sm text-slate-500 font-mono">{document.invoiceNumber}</p>
+          {clientName && (
+            <p className="text-xs text-slate-400 mt-1 truncate" title={clientName}>
+              <Icon name="folder" className="w-3 h-3 inline-block mr-1" />
+              {clientName}
+            </p>
+          )}
         </div>
       </div>
-      <div className="border-t border-slate-200 mt-2 p-3 flex justify-between items-center text-sm">
+      <div className="border-t border-slate-200 p-3 flex justify-between items-center text-sm">
         <p className="text-lg font-bold text-slate-800">
           ${document.amount.toFixed(2)}
         </p>

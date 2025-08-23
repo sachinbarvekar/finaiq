@@ -64,3 +64,18 @@ export interface Document {
     payment: PaymentStatus;
     dueDate: string;
 }
+
+export type UserRole = 'Admin' | 'Client';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatarUrl: string;
+  phone: string;
+  team: string;
+  memberSince: string;
+  clientId?: string; // For client-role users to associate with client data
+  folderId?: string; // For client-role users
+}

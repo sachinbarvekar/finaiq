@@ -1,25 +1,16 @@
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import EditProfileModal from '../components/profile/EditProfileModal';
 import ChangePasswordModal from '../components/profile/ChangePasswordModal';
+import { useAuth } from './AuthContext';
+import { User } from '../types';
 
-// Mock initial admin data
-const MOCK_ADMIN = {
-  name: 'Sagar Agrobeet',
-  email: 'sagar@agrobeet.com',
-  role: 'Administrator',
-  avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop',
-  phone: '123-456-7890',
-  team: 'Platform Operations',
-  memberSince: '2022-08-22',
-};
-
-type AdminUser = typeof MOCK_ADMIN;
-export type EditableAdminData = Pick<AdminUser, 'name' | 'phone' | 'team'>;
+export type ProfileUser = User;
+export type EditableProfileData = Pick<ProfileUser, 'name' | 'phone' | 'team'>;
 
 interface ProfileContextType {
-  adminUser: AdminUser;
-  updateAdminProfile: (data: EditableAdminData) => void;
+  currentUser: ProfileUser | null;
+  updateCurrentUser: (data: EditableProfileData) => void;
   openEditModal: () => void;
   openChangePasswordModal: () => void;
 }
@@ -27,12 +18,19 @@ interface ProfileContextType {
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
 export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [adminUser, setAdminUser] = useState<AdminUser>(MOCK_ADMIN);
+  const { user } = useAuth(); // Get authenticated user
+  const [currentUser, setCurrentUser] = useState<ProfileUser | null>(user);
+  
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
-  const updateAdminProfile = (data: EditableAdminData) => {
-    setAdminUser(prev => ({ ...prev, ...data }));
+  useEffect(() => {
+    setCurrentUser(user);
+  }, [user]);
+
+  const updateCurrentUser = (data: EditableProfileData) => {
+    setCurrentUser(prev => (prev ? { ...prev, ...data } : null));
+    // In a real app, you would also update the user object in AuthContext and call an API.
   };
   
   const openEditModal = () => setIsEditModalOpen(true);
@@ -41,8 +39,8 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
   const openChangePasswordModal = () => setIsChangePasswordModalOpen(true);
   const closeChangePasswordModal = () => setIsChangePasswordModalOpen(false);
 
-  const handleProfileSubmit = (data: EditableAdminData) => {
-    updateAdminProfile(data);
+  const handleProfileSubmit = (data: EditableProfileData) => {
+    updateCurrentUser(data);
     closeEditModal();
   };
 
@@ -51,9 +49,15 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
     closeChangePasswordModal();
   }
 
+  if (!currentUser) {
+    // This can be a loading spinner in a real app
+    // For now, it prevents downstream components from crashing if the user is not loaded.
+    return <>{children}</>;
+  }
+
   const value = {
-    adminUser,
-    updateAdminProfile,
+    currentUser,
+    updateCurrentUser,
     openEditModal,
     openChangePasswordModal,
   };
@@ -61,17 +65,21 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
   return (
     <ProfileContext.Provider value={value}>
       {children}
-      <EditProfileModal 
-        isOpen={isEditModalOpen}
-        onClose={closeEditModal}
-        onSubmit={handleProfileSubmit}
-        currentUser={adminUser}
-      />
-      <ChangePasswordModal
-        isOpen={isChangePasswordModalOpen}
-        onClose={closeChangePasswordModal}
-        onSubmit={handleChangePasswordSubmit}
-      />
+      {currentUser && (
+        <>
+            <EditProfileModal 
+                isOpen={isEditModalOpen}
+                onClose={closeEditModal}
+                onSubmit={handleProfileSubmit}
+                currentUser={currentUser}
+            />
+            <ChangePasswordModal
+                isOpen={isChangePasswordModalOpen}
+                onClose={closeChangePasswordModal}
+                onSubmit={handleChangePasswordSubmit}
+            />
+        </>
+      )}
     </ProfileContext.Provider>
   );
 };

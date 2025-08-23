@@ -2,6 +2,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Icon, IconName } from '../ui/Icon';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface NavItemProps {
   to: string;
@@ -35,6 +36,26 @@ interface NavContentProps {
 }
 
 const NavContent: React.FC<NavContentProps> = ({ onLinkClick }) => {
+    const { user } = useAuth();
+
+    const adminNav = (
+      <>
+        <NavItem to="/dashboard" icon="dashboard" label="Dashboard" onLinkClick={onLinkClick} />
+        <NavItem to="/dashboard/clients" icon="users" label="Clients" onLinkClick={onLinkClick} />
+        <NavItem to="/dashboard/folders" icon="folder" label="Folders" onLinkClick={onLinkClick} />
+        <NavItem to="/dashboard/documents" icon="document-text" label="All Documents" onLinkClick={onLinkClick} />
+        <NavItem to="/dashboard/workflows" icon="workflow" label="Workflows" onLinkClick={onLinkClick} />
+      </>
+    );
+
+    const clientNav = user?.folderId ? (
+      <>
+        <NavItem to="/dashboard" icon="dashboard" label="Dashboard" onLinkClick={onLinkClick} />
+        <NavItem to={`/dashboard/folders/${user.folderId}`} icon="document" label="My Documents" onLinkClick={onLinkClick} />
+      </>
+    ) : null;
+
+
     return (
         <>
             <div className="flex items-center mb-8 px-2">
@@ -43,14 +64,13 @@ const NavContent: React.FC<NavContentProps> = ({ onLinkClick }) => {
                 </div>
                 <div>
                     <h1 className="text-xl font-bold text-slate-800">Finaiq</h1>
-                    <p className="text-xs text-slate-500">Document Processing</p>
+                    <p className="text-xs text-slate-500">
+                      {user?.role === 'Admin' ? 'Document Processing' : (user?.team || 'Client Portal')}
+                    </p>
                 </div>
             </div>
             <nav className="flex-1">
-                <NavItem to="/dashboard" icon="dashboard" label="Dashboard" onLinkClick={onLinkClick} />
-                <NavItem to="/dashboard/clients" icon="users" label="Clients" onLinkClick={onLinkClick} />
-                <NavItem to="/dashboard/folders" icon="folder" label="Folders" onLinkClick={onLinkClick} />
-                <NavItem to="/dashboard/workflows" icon="workflow" label="Workflows" onLinkClick={onLinkClick} />
+                {user?.role === 'Admin' ? adminNav : clientNav}
             </nav>
         </>
     );

@@ -22,7 +22,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
-  const { adminUser } = useProfile();
+  const { currentUser } = useProfile();
   const { logout } = useAuth();
 
   useEffect(() => {
@@ -45,6 +45,20 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
     setDropdownOpen(false);
     logout();
   };
+
+  if (!currentUser) {
+    return (
+      <header className="bg-white shadow-sm p-4 flex items-center justify-between">
+        <button 
+          onClick={onMenuClick}
+          className="md:hidden text-slate-500 hover:text-primary transition-colors"
+          aria-label="Open menu"
+        >
+          <Icon name="menu" className="w-6 h-6" />
+        </button>
+      </header>
+    );
+  }
 
   return (
     <header className="bg-white shadow-sm p-4 flex items-center justify-between">
@@ -108,8 +122,8 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
             aria-expanded={dropdownOpen}
           >
             <img
-              src={adminUser.avatarUrl}
-              alt={adminUser.name}
+              src={currentUser.avatarUrl}
+              alt={currentUser.name}
               className="w-full h-full object-cover"
             />
           </button>

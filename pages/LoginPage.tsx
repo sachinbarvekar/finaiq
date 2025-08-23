@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -5,8 +6,8 @@ import Button from '../components/ui/Button';
 import { Icon } from '../components/ui/Icon';
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState('sagar@agrobeet.com');
-  const [password, setPassword] = useState('test');
+  const [email, setEmail] = useState('admin@finaiq.com');
+  const [password, setPassword] = useState('admin123');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -18,8 +19,7 @@ const LoginPage: React.FC = () => {
     setError('');
     setIsLoading(true);
     try {
-      // Use test credentials for mock login
-      await login('test@gmail.com', 'test');
+      await login(email, password);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Failed to sign in.');
@@ -79,6 +79,11 @@ const LoginPage: React.FC = () => {
             </div>
             
             {error && <p className="text-sm text-red-500">{error}</p>}
+            
+            <p className="text-center text-xs text-slate-400 !mt-2">
+              <b>Admin:</b> admin@finaiq.com / admin123<br/>
+              <b>Client:</b> client@innovate.com / client123
+            </p>
 
             <div className="flex items-center justify-end">
                 <a href="#" className="text-sm font-medium text-primary hover:underline">

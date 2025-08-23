@@ -42,12 +42,14 @@ const SettingToggle: React.FC<{ label: string; description: string; enabled: boo
 
 // Main component
 const MyProfilePage: React.FC = () => {
-  const { adminUser, openEditModal, openChangePasswordModal } = useProfile();
+  const { currentUser, openEditModal, openChangePasswordModal } = useProfile();
   const [notifications, setNotifications] = useState({
       email: true,
       reports: true,
       alerts: false,
   });
+
+  if (!currentUser) return null;
 
   const handleToggle = (key: keyof typeof notifications) => {
       setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
@@ -59,13 +61,13 @@ const MyProfilePage: React.FC = () => {
       <div className="bg-white rounded-2xl shadow-sm p-6 flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="flex items-center">
           <img
-            src={adminUser.avatarUrl}
-            alt={adminUser.name}
+            src={currentUser.avatarUrl}
+            alt={currentUser.name}
             className="w-20 h-20 rounded-full object-cover border-4 border-slate-200 mr-5"
           />
           <div>
-            <h1 className="text-3xl font-bold text-slate-800">{adminUser.name}</h1>
-            <p className="text-slate-500">{adminUser.role}</p>
+            <h1 className="text-3xl font-bold text-slate-800">{currentUser.name}</h1>
+            <p className="text-slate-500">{currentUser.role}</p>
           </div>
         </div>
         <Button variant="primary" leftIcon={<Icon name="edit" className="w-4 h-4" />} onClick={openEditModal}>
@@ -78,10 +80,10 @@ const MyProfilePage: React.FC = () => {
         <div className="lg:col-span-1 space-y-6">
           <InfoCard title="About Me" icon="user-circle">
             <div className="space-y-4">
-              <InfoItem label="Email Address" value={adminUser.email} icon="inbox" />
-              <InfoItem label="Phone Number" value={adminUser.phone} icon="phone" />
-              <InfoItem label="Team" value={adminUser.team} icon="users" />
-              <InfoItem label="Member Since" value={new Date(adminUser.memberSince).toLocaleDateString()} icon="calendar"/>
+              <InfoItem label="Email Address" value={currentUser.email} icon="inbox" />
+              <InfoItem label="Phone Number" value={currentUser.phone} icon="phone" />
+              <InfoItem label="Team" value={currentUser.team} icon="users" />
+              <InfoItem label="Member Since" value={new Date(currentUser.memberSince).toLocaleDateString()} icon="calendar"/>
             </div>
           </InfoCard>
         </div>

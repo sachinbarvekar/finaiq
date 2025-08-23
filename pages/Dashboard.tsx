@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, IconName } from '../components/ui/Icon';
@@ -9,11 +10,17 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  PieChart,
+  Pie,
+  Cell,
 } from 'recharts';
 import { DocumentProcessingStatus } from '../types';
 import { useProfile } from '../contexts/ProfileContext';
 import { useDocuments } from '../contexts/DocumentContext';
 import { useClients } from '../contexts/ClientContext';
+import { useAuth } from '../contexts/AuthContext';
+import Button from '../components/ui/Button';
+import Badge from '../components/ui/Badge';
 
 
 // --- Page-specific components ---
@@ -185,18 +192,20 @@ const QuickActions: React.FC = () => (
 );
 
 
-// --- Main Dashboard Component ---
+// --- Admin Dashboard View ---
 
-const Dashboard: React.FC = () => {
-  const { adminUser } = useProfile();
+const AdminDashboard: React.FC = () => {
+  const { currentUser } = useProfile();
   const { clients } = useClients();
   const { documents } = useDocuments();
   const pendingReviews = documents.filter(d => d.status === DocumentProcessingStatus.ReviewRequired).length;
 
+  if (!currentUser) return null;
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-800">Welcome back, {adminUser.name.split(' ')[0]}!</h1>
+        <h1 className="text-3xl font-bold text-slate-800">Welcome back, {currentUser.name.split(' ')[0]}!</h1>
         <p className="text-slate-500">Here's your performance summary for this week.</p>
       </div>
       
@@ -225,6 +234,166 @@ const Dashboard: React.FC = () => {
       </div>
     </div>
   );
+};
+
+// --- Client Dashboard View ---
+
+const ClientDashboard: React.FC = () => {
+  const { user } = useAuth();
+  const { getClientById } = useClients();
+  const { getDocumentsByFolderId, openImportModal } = useDocuments();
+
+  if (!user || !user.clientId || !user.folderId) return null;
+  
+  const client = getClientById(user.clientId);
+  const documents = getDocumentsByFolderId(user.folderId);
+  const clientFolder = { id: user.folderId, folderName: client?.companyName || '' };
+
+  const stats = {
+      total: documents.length,
+      pending: documents.filter(d => d.status === DocumentProcessingStatus.ReviewRequired).length,
+      ready: documents.filter(d => d.status === DocumentProcessingStatus.Ready).length,
+      errors: documents.filter(d => d.status === DocumentProcessingStatus.ExportError).length,
+  };
+
+  const chartData = [
+    { name: 'Ready', value: stats.ready },
+    { name: 'Pending', value: stats.pending },
+    { name: 'Errors', value: stats.errors },
+  ];
+  const COLORS = ['#22c55e', '#f59e0b', '#ef4444'];
+
+  const recentDocuments = [...documents].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
+
+  const StatusProgress: React.FC<{title: string, count: number, total: number, color: string}> = ({title, count, total, color}) => (
+    <div>
+        <div className="flex justify-between items-center mb-1">
+            <p className="text-sm font-medium text-slate-700">{title}</p>
+            <p className="text-sm font-semibold text-slate-800">{count}</p>
+        </div>
+        <div className="w-full bg-slate-200 rounded-full h-1.5">
+            <div className={`${color} h-1.5 rounded-full`} style={{ width: total > 0 ? `${(count / total) * 100}%` : '0%' }}></div>
+        </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+        <div>
+            <h1 className="text-3xl font-bold text-slate-800">Welcome, {user.name.split(' ')[0]}!</h1>
+            <p className="text-slate-500">Here's a summary of your documents and actions.</p>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column */}
+            <div className="lg:col-span-2 space-y-6">
+                {/* Upload Area */}
+                <div 
+                    className="bg-white p-6 rounded-2xl shadow-sm border-2 border-dashed border-slate-300 hover:border-primary hover:bg-slate-50 transition-all duration-200 cursor-pointer"
+                    onClick={() => openImportModal(clientFolder as any)}
+                >
+                    <div className="flex flex-col items-center justify-center text-center">
+                        <div className="w-12 h-12 flex items-center justify-center bg-slate-100 rounded-full mb-3">
+                            <Icon name="upload" className="w-6 h-6 text-slate-500"/>
+                        </div>
+                        <h3 className="font-bold text-slate-800">Upload Your Documents</h3>
+                        <p className="text-sm text-slate-500">Drag & drop files here or click to browse.</p>
+                    </div>
+                </div>
+                
+                {/* Status Overview */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm">
+                    <h3 className="text-lg font-bold text-slate-800 mb-4">Processing Status</h3>
+                    <div className="space-y-4">
+                        <StatusProgress title="Pending Review" count={stats.pending} total={stats.total} color="bg-yellow-500" />
+                        <StatusProgress title="Ready for Export" count={stats.ready} total={stats.total} color="bg-green-500" />
+                        <StatusProgress title="Export Errors" count={stats.errors} total={stats.total} color="bg-red-500" />
+                    </div>
+                </div>
+
+                 {/* Recent Documents */}
+                 <div className="bg-white p-6 rounded-2xl shadow-sm">
+                    <h3 className="text-lg font-bold text-slate-800 mb-4">Recent Activity</h3>
+                     <div className="space-y-2">
+                        {recentDocuments.length > 0 ? recentDocuments.map(doc => (
+                            <Link to={`/dashboard/folders/${doc.folderId}/documents/${doc.id}`} key={doc.id} className="block p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center">
+                                        <Icon name="document-text" className="w-5 h-5 text-slate-400 mr-3"/>
+                                        <div>
+                                            <p className="font-medium text-slate-800">{doc.supplier}</p>
+                                            <p className="text-sm text-slate-500">#{doc.invoiceNumber} - ${doc.amount.toFixed(2)}</p>
+                                        </div>
+                                    </div>
+                                    <Badge status={doc.status} />
+                                </div>
+                            </Link>
+                        )) : (
+                            <p className="text-slate-500 text-center py-4">No recent documents found.</p>
+                        )}
+                     </div>
+                </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="lg:col-span-1 space-y-6">
+                 {/* Document Summary Chart */}
+                 <div className="bg-white p-6 rounded-2xl shadow-sm">
+                    <h3 className="text-lg font-bold text-slate-800 mb-4">Document Summary</h3>
+                    <div className="h-48">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie data={chartData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} fill="#8884d8" paddingAngle={5} dataKey="value">
+                                    {chartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e0e0e0', borderRadius: '0.5rem' }}/>
+                                <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-2xl font-bold fill-slate-800">{stats.total}</text>
+                                <text x="50%" y="50%" dy={20} textAnchor="middle" className="text-sm fill-slate-500">Total Docs</text>
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                    <div className="flex justify-around text-center mt-4">
+                        {chartData.map((item, index) => (
+                            <div key={item.name} className="flex items-center text-sm">
+                                <span className="w-3 h-3 rounded-full mr-2" style={{backgroundColor: COLORS[index]}}></span>
+                                <span>{item.name}</span>
+                            </div>
+                        ))}
+                    </div>
+                 </div>
+                 {/* Quick Links */}
+                 <div className="bg-white p-6 rounded-2xl shadow-sm">
+                    <h3 className="text-lg font-bold text-slate-800 mb-4">Quick Links</h3>
+                    <div className="space-y-2">
+                        <Link to={`/dashboard/folders/${user.folderId}`} className="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                            <Icon name="folder" className="w-5 h-5 text-primary mr-3"/>
+                            <span className="font-medium text-slate-700">View All Documents</span>
+                        </Link>
+                        <Link to="/dashboard/profile" className="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                            <Icon name="user-circle" className="w-5 h-5 text-primary mr-3"/>
+                            <span className="font-medium text-slate-700">Manage Your Profile</span>
+                        </Link>
+                    </div>
+                 </div>
+            </div>
+        </div>
+    </div>
+  );
+};
+
+// --- Main Dashboard Component ---
+
+const Dashboard: React.FC = () => {
+  const { user } = useAuth();
+  
+  if (user?.role === 'Client') {
+    return <ClientDashboard />;
+  }
+
+  // Fallback to AdminDashboard for admins or if role is not defined
+  return <AdminDashboard />;
 };
 
 export default Dashboard;

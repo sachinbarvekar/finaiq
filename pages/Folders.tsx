@@ -7,6 +7,7 @@ import { Icon, IconName } from '../components/ui/Icon';
 import Pagination from '../components/ui/Pagination';
 import { FolderStatus, Folder } from '../types';
 import { useDocuments } from '../contexts/DocumentContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const FOLDERS_PER_PAGE = 8;
 
@@ -23,19 +24,25 @@ const StatCard: React.FC<{ title: string; value: number | string; icon: IconName
 );
 
 const Folders: React.FC = () => {
-  const { folders, openInviteModal, openPreferencesModal, openImportSettingsModal } = useClients();
+  const { clients, folders, openInviteModal, openPreferencesModal, openImportSettingsModal } = useClients();
   const { documents } = useDocuments();
+  const { user } = useAuth();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<FolderStatus | 'All'>('All');
   const [currentPage, setCurrentPage] = useState(1);
   
+  const adminFolders = useMemo(() => {
+    const adminClientIds = clients.filter(c => c.adminId === user?.id).map(c => c.id);
+    return folders.filter(folder => adminClientIds.includes(folder.clientId));
+  }, [folders, clients, user]);
+
   const foldersWithDocCount = useMemo(() => {
-    return folders.map(folder => ({
+    return adminFolders.map(folder => ({
       ...folder,
       documentCount: documents.filter(d => d.folderId === folder.id).length
     }));
-  }, [folders, documents]);
+  }, [adminFolders, documents]);
 
   const filteredFolders = useMemo(() => {
     return foldersWithDocCount
@@ -54,12 +61,17 @@ const Folders: React.FC = () => {
   }, [filteredFolders, currentPage]);
   
   const totalPages = Math.ceil(filteredFolders.length / FOLDERS_PER_PAGE);
+  
+  const adminDocuments = useMemo(() => {
+    const adminFolderIds = adminFolders.map(f => f.id);
+    return documents.filter(d => adminFolderIds.includes(d.folderId));
+  }, [documents, adminFolders]);
 
   // Stats
-  const totalFolders = folders.length;
-  const totalDocuments = documents.length;
-  const pendingImports = folders.filter(f => f.status === FolderStatus.PendingImport).length;
-  const archivedFolders = folders.filter(f => f.status === FolderStatus.Archived).length;
+  const totalFolders = adminFolders.length;
+  const totalDocuments = adminDocuments.length;
+  const pendingImports = adminFolders.filter(f => f.status === FolderStatus.PendingImport).length;
+  const archivedFolders = adminFolders.filter(f => f.status === FolderStatus.Archived).length;
   
   return (
     <div>

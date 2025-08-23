@@ -7,11 +7,12 @@ import IntegrationModal from '../components/clients/IntegrationModal';
 import InviteUserModal from '../components/folders/InviteUserModal';
 import FolderPreferencesModal from '../components/folders/FolderPreferencesModal';
 import ImportSettingsModal from '../components/folders/ImportSettingsModal';
+import { useAuth } from './AuthContext';
 
 interface ClientContextType {
   clients: Client[];
   getClientById: (id: string) => Client | undefined;
-  addClient: (clientData: Omit<Client, 'id' | 'status' | 'accountCreated' | 'lastActivity' | 'monthlyGrowth' | 'folderId' | 'integration' | 'approvedDocs' | 'pendingDocs' | 'rejectedDocs'>) => void;
+  addClient: (clientData: Omit<Client, 'id' | 'status' | 'accountCreated' | 'lastActivity' | 'monthlyGrowth' | 'folderId' | 'integration' | 'approvedDocs' | 'pendingDocs' | 'rejectedDocs' | 'adminId'>) => void;
   updateClient: (clientId: string, clientData: Partial<Omit<Client, 'id'>>) => void;
   deleteClient: (clientId: string) => void;
   // Form Modal
@@ -37,6 +38,7 @@ interface ClientContextType {
 const ClientContext = createContext<ClientContextType | undefined>(undefined);
 
 export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
   const [clients, setClients] = useState<Client[]>(MOCK_CLIENTS);
   const [folders, setFolders] = useState<Folder[]>(MOCK_FOLDERS);
   
@@ -114,7 +116,9 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
 
   // Client and Folder Data Logic
-  const addClient = (clientData: Omit<Client, 'id' | 'status' | 'accountCreated' | 'lastActivity' | 'monthlyGrowth' | 'folderId' | 'integration' | 'approvedDocs' | 'pendingDocs' | 'rejectedDocs'>) => {
+  const addClient = (clientData: Omit<Client, 'id' | 'status' | 'accountCreated' | 'lastActivity' | 'monthlyGrowth' | 'folderId' | 'integration' | 'approvedDocs' | 'pendingDocs' | 'rejectedDocs' | 'adminId'>) => {
+      if (!user || user.role === 'Client') return; // Only admins/superadmins can add clients
+
       const newClientId = `C${(clients.length + 1).toString().padStart(3, '0')}`;
       const newFolderId = `F${(folders.length + 1).toString().padStart(3, '0')}`;
 
@@ -130,6 +134,7 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         approvedDocs: 0,
         pendingDocs: 0,
         rejectedDocs: 0,
+        adminId: user.id,
       };
       setClients(prev => [...prev, newClient]);
 
@@ -170,7 +175,7 @@ export const ClientProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setFolders(folders.map(f => f.id === folderId ? { ...f, ...folderData } : f));
   };
 
-  const handleFormSubmit = (clientData: Omit<Client, 'id' | 'status' | 'accountCreated' | 'lastActivity' | 'monthlyGrowth' | 'folderId' | 'integration' | 'approvedDocs' | 'pendingDocs' | 'rejectedDocs'>) => {
+  const handleFormSubmit = (clientData: Omit<Client, 'id' | 'status' | 'accountCreated' | 'lastActivity' | 'monthlyGrowth' | 'folderId' | 'integration' | 'approvedDocs' | 'pendingDocs' | 'rejectedDocs' | 'adminId'>) => {
     if (clientToEdit) {
       updateClient(clientToEdit.id, clientData);
     } else {

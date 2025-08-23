@@ -38,22 +38,41 @@ interface NavContentProps {
 const NavContent: React.FC<NavContentProps> = ({ onLinkClick }) => {
     const { user } = useAuth();
 
-    const adminNav = (
-      <>
-        <NavItem to="/dashboard" icon="dashboard" label="Dashboard" onLinkClick={onLinkClick} />
-        <NavItem to="/dashboard/clients" icon="users" label="Clients" onLinkClick={onLinkClick} />
-        <NavItem to="/dashboard/folders" icon="folder" label="Folders" onLinkClick={onLinkClick} />
-        <NavItem to="/dashboard/documents" icon="document-text" label="All Documents" onLinkClick={onLinkClick} />
-        <NavItem to="/dashboard/workflows" icon="workflow" label="Workflows" onLinkClick={onLinkClick} />
-      </>
-    );
-
-    const clientNav = user?.folderId ? (
-      <>
-        <NavItem to="/dashboard" icon="dashboard" label="Dashboard" onLinkClick={onLinkClick} />
-        <NavItem to={`/dashboard/folders/${user.folderId}`} icon="document" label="My Documents" onLinkClick={onLinkClick} />
-      </>
-    ) : null;
+    const renderNavItems = () => {
+        switch (user?.role) {
+            case 'SuperAdmin':
+                return (
+                    <>
+                        <NavItem to="/dashboard" icon="dashboard" label="Dashboard" onLinkClick={onLinkClick} />
+                        <NavItem to="/dashboard/workflows" icon="workflow" label="Workflows" onLinkClick={onLinkClick} />
+                        <div className="my-4 border-t border-slate-200 -mx-4"></div>
+                        <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Platform</p>
+                        <NavItem to="/dashboard/team" icon="briefcase" label="Admins" onLinkClick={onLinkClick} />
+                        <NavItem to="/dashboard/system-health" icon="server" label="System Health" onLinkClick={onLinkClick} />
+                        <NavItem to="/dashboard/settings" icon="settings" label="Global Settings" onLinkClick={onLinkClick} />
+                    </>
+                );
+            case 'Admin':
+                 return (
+                    <>
+                        <NavItem to="/dashboard" icon="dashboard" label="Dashboard" onLinkClick={onLinkClick} />
+                        <NavItem to="/dashboard/clients" icon="users" label="Clients" onLinkClick={onLinkClick} />
+                        <NavItem to="/dashboard/folders" icon="folder" label="Folders" onLinkClick={onLinkClick} />
+                        <NavItem to="/dashboard/documents" icon="document-text" label="All Documents" onLinkClick={onLinkClick} />
+                        <NavItem to="/dashboard/workflows" icon="workflow" label="Workflows" onLinkClick={onLinkClick} />
+                    </>
+                );
+            case 'Client':
+                 return user?.folderId ? (
+                    <>
+                        <NavItem to="/dashboard" icon="dashboard" label="Dashboard" onLinkClick={onLinkClick} />
+                        <NavItem to={`/dashboard/folders/${user.folderId}`} icon="document" label="My Documents" onLinkClick={onLinkClick} />
+                    </>
+                ) : null;
+            default:
+                return null;
+        }
+    };
 
 
     return (
@@ -65,12 +84,12 @@ const NavContent: React.FC<NavContentProps> = ({ onLinkClick }) => {
                 <div>
                     <h1 className="text-xl font-bold text-slate-800">Finaiq</h1>
                     <p className="text-xs text-slate-500">
-                      {user?.role === 'Admin' ? 'Document Processing' : (user?.team || 'Client Portal')}
+                      {user?.role === 'Client' ? (user?.team || 'Client Portal') : 'Document Processing'}
                     </p>
                 </div>
             </div>
             <nav className="flex-1">
-                {user?.role === 'Admin' ? adminNav : clientNav}
+                {renderNavItems()}
             </nav>
         </>
     );

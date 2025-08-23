@@ -1,4 +1,55 @@
-import { Client, ClientStatus, Folder, FolderStatus, Document, DocumentProcessingStatus, PaymentStatus } from './types';
+import { Client, ClientStatus, Folder, FolderStatus, Document, DocumentProcessingStatus, PaymentStatus, User } from './types';
+
+// Mock Users
+export const MOCK_SUPER_ADMIN_USER: User = {
+  id: 'SA001',
+  name: 'Super Admin',
+  email: 'superadmin@finaiq.com',
+  role: 'SuperAdmin',
+  avatarUrl: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=200&auto=format&fit=crop',
+  phone: '111-222-3333',
+  team: 'Platform Administration',
+  memberSince: '2022-01-01',
+};
+
+export const MOCK_ADMIN_USER: User = {
+  id: 'A001',
+  name: 'Sagar Agrobeet',
+  email: 'admin@finaiq.com',
+  role: 'Admin',
+  avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop',
+  phone: '123-456-7890',
+  team: 'Platform Operations',
+  memberSince: '2022-08-22',
+};
+
+export const MOCK_CLIENT_USER: User = {
+  id: 'U001',
+  name: 'John Doe',
+  email: 'client@innovate.com',
+  role: 'Client',
+  avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop',
+  phone: '555-111-2222',
+  team: 'Innovate Inc.',
+  memberSince: '2023-01-15',
+  clientId: 'C001',
+  folderId: 'F001'
+};
+
+
+export const MOCK_ADMIN_USER_2: User = {
+  id: 'A002',
+  name: 'Jane Smith',
+  email: 'admin2@finaiq.com',
+  role: 'Admin',
+  avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop',
+  phone: '987-654-3210',
+  team: 'Client Success',
+  memberSince: '2023-01-10',
+};
+
+export const MOCK_ADMIN_USERS: User[] = [MOCK_ADMIN_USER, MOCK_ADMIN_USER_2];
+
 
 export const MOCK_CLIENTS: Client[] = [
   { 
@@ -18,6 +69,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 118,
     pendingDocs: 11,
     rejectedDocs: 7,
+    adminId: 'A001',
   },
   { 
     id: 'C002', 
@@ -36,6 +88,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 250,
     pendingDocs: 5,
     rejectedDocs: 2,
+    adminId: 'A001',
   },
   { 
     id: 'C003', 
@@ -54,6 +107,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 50,
     pendingDocs: 0,
     rejectedDocs: 1,
+    adminId: 'A001',
   },
   { 
     id: 'C004', 
@@ -72,6 +126,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 300,
     pendingDocs: 25,
     rejectedDocs: 12,
+    adminId: 'A001',
   },
   { 
     id: 'C005', 
@@ -90,6 +145,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 180,
     pendingDocs: 0,
     rejectedDocs: 4,
+    adminId: 'A001',
   },
   {
     id: 'C006',
@@ -108,6 +164,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 450,
     pendingDocs: 15,
     rejectedDocs: 8,
+    adminId: 'A001',
   },
   {
     id: 'C007',
@@ -126,6 +183,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 95,
     pendingDocs: 0,
     rejectedDocs: 3,
+    adminId: 'A001',
   },
   {
     id: 'C008',
@@ -144,6 +202,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 620,
     pendingDocs: 30,
     rejectedDocs: 10,
+    adminId: 'A002',
   },
   {
     id: 'C009',
@@ -162,6 +221,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 320,
     pendingDocs: 4,
     rejectedDocs: 6,
+    adminId: 'A002',
   },
   {
     id: 'C010',
@@ -180,6 +240,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 150,
     pendingDocs: 12,
     rejectedDocs: 5,
+    adminId: 'A002',
   },
   {
     id: 'C011',
@@ -198,6 +259,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 500,
     pendingDocs: 0,
     rejectedDocs: 20,
+    adminId: 'A002',
   },
   {
     id: 'C012',
@@ -216,6 +278,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 1200,
     pendingDocs: 50,
     rejectedDocs: 30,
+    adminId: 'A002',
   },
   {
     id: 'C013',
@@ -234,6 +297,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 80,
     pendingDocs: 8,
     rejectedDocs: 1,
+    adminId: 'A002',
   },
   {
     id: 'C014',
@@ -252,6 +316,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 750,
     pendingDocs: 22,
     rejectedDocs: 14,
+    adminId: 'A002',
   },
   {
     id: 'C015',
@@ -270,6 +335,7 @@ export const MOCK_CLIENTS: Client[] = [
     approvedDocs: 120,
     pendingDocs: 0,
     rejectedDocs: 0,
+    adminId: 'A002',
   },
 ];
 

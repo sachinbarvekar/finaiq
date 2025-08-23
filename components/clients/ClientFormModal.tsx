@@ -7,7 +7,7 @@ import { Client } from '../../types';
 interface ClientFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (clientData: Omit<Client, 'id' | 'status' | 'accountCreated' | 'lastActivity' | 'monthlyGrowth' | 'folderId' | 'integration' | 'approvedDocs' | 'pendingDocs' | 'rejectedDocs'>) => void;
+  onSubmit: (clientData: Omit<Client, 'id' | 'status' | 'accountCreated' | 'lastActivity' | 'monthlyGrowth' | 'folderId' | 'integration' | 'approvedDocs' | 'pendingDocs' | 'rejectedDocs' | 'adminId'>) => void;
   clientToEdit: Client | null;
 }
 

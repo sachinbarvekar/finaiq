@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDocuments } from '../contexts/DocumentContext';
@@ -9,6 +10,7 @@ import { Icon, IconName } from '../components/ui/Icon';
 import DocumentCard from '../components/documents/DocumentCard';
 import DocumentBoard from '../components/documents/DocumentBoard';
 import Button from '../components/ui/Button';
+import { useAuth } from '../contexts/AuthContext';
 
 const DOCUMENTS_PER_PAGE = 12; // Adjusted for grid view
 type ViewMode = 'list' | 'grid' | 'board';
@@ -27,7 +29,8 @@ const StatCard: React.FC<{ title: string; value: number | string; icon: IconName
 
 const AllDocumentsPage: React.FC = () => {
     const { documents, openEditModal, openDeleteModal, reprocessDocuments, updateDocument } = useDocuments();
-    const { clients } = useClients();
+    const { clients, folders } = useClients();
+    const { user } = useAuth();
     const [searchParams] = useSearchParams();
 
     // State
@@ -46,20 +49,26 @@ const AllDocumentsPage: React.FC = () => {
         }
     }, [searchParams]);
     
-    // Add effect to reset selection when view or page changes
     useEffect(() => {
       setSelectedDocuments([]);
     }, [currentPage, viewMode, statusFilter, searchTerm]);
+    
+    const adminDocuments = useMemo(() => {
+        const adminClientIds = clients.filter(c => c.adminId === user?.id).map(c => c.id);
+        const adminFolderIds = folders.filter(f => adminClientIds.includes(f.clientId)).map(f => f.id);
+        return documents.filter(doc => adminFolderIds.includes(doc.folderId));
+    }, [documents, folders, clients, user]);
 
     const documentsWithClient = useMemo(() => {
-        return documents.map(doc => {
-            const folder = clients.find(c => c.folderId === doc.folderId);
+        return adminDocuments.map(doc => {
+            const folder = folders.find(f => f.id === doc.folderId);
+            const client = folder ? clients.find(c => c.id === folder.clientId) : undefined;
             return {
                 ...doc,
-                clientName: folder ? folder.companyName : 'Unknown Client'
+                clientName: client ? client.companyName : 'Unknown Client'
             };
         });
-    }, [documents, clients]);
+    }, [adminDocuments, clients, folders]);
 
     const filteredDocuments = useMemo(() => {
         return documentsWithClient
@@ -116,10 +125,10 @@ const AllDocumentsPage: React.FC = () => {
     };
     
     // Calculate stats for cards
-    const totalDocuments = documents.length;
-    const readyDocuments = documents.filter(doc => doc.status === DocumentProcessingStatus.Ready).length;
-    const reviewDocuments = documents.filter(doc => doc.status === DocumentProcessingStatus.ReviewRequired).length;
-    const errorDocuments = documents.filter(doc => doc.status === DocumentProcessingStatus.ExportError).length;
+    const totalDocuments = adminDocuments.length;
+    const readyDocuments = adminDocuments.filter(doc => doc.status === DocumentProcessingStatus.Ready).length;
+    const reviewDocuments = adminDocuments.filter(doc => doc.status === DocumentProcessingStatus.ReviewRequired).length;
+    const errorDocuments = adminDocuments.filter(doc => doc.status === DocumentProcessingStatus.ExportError).length;
 
     const renderContent = () => {
         switch(viewMode) {

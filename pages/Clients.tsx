@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Client, ClientStatus } from '../types';
 import ClientTable from '../components/clients/ClientTable';
@@ -6,6 +7,7 @@ import Button from '../components/ui/Button';
 import { Icon, IconName } from '../components/ui/Icon';
 import Pagination from '../components/ui/Pagination';
 import { useClients } from '../contexts/ClientContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const CLIENTS_PER_PAGE = 5;
 
@@ -23,6 +25,7 @@ const StatCard: React.FC<{ title: string; value: number | string; icon: IconName
 
 const Clients: React.FC = () => {
   const { clients, openFormModal, deleteClient } = useClients();
+  const { user } = useAuth();
   
   // State for modals
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -32,10 +35,14 @@ const Clients: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<ClientStatus | 'All'>('All');
   const [currentPage, setCurrentPage] = useState(1);
+  
+  const adminClients = useMemo(() => {
+    return clients.filter(client => client.adminId === user?.id);
+  }, [clients, user]);
 
   // Memoized filtering and searching
   const filteredClients = useMemo(() => {
-    return clients
+    return adminClients
       .filter(client => {
         if (statusFilter === 'All') return true;
         return client.status === statusFilter;
@@ -48,7 +55,7 @@ const Clients: React.FC = () => {
           client.email.toLowerCase().includes(search)
         );
       });
-  }, [clients, searchTerm, statusFilter]);
+  }, [adminClients, searchTerm, statusFilter]);
 
   // Memoized pagination
   const paginatedClients = useMemo(() => {
@@ -73,14 +80,14 @@ const Clients: React.FC = () => {
   };
 
   const handleOpenEditModal = (clientId: string) => {
-    const client = clients.find(c => c.id === clientId);
+    const client = adminClients.find(c => c.id === clientId);
     if (client) {
       openFormModal(client);
     }
   };
   
   const handleOpenDeleteModal = (clientId: string) => {
-    const client = clients.find(c => c.id === clientId);
+    const client = adminClients.find(c => c.id === clientId);
     if (client) {
       setSelectedClient(client);
       setIsDeleteModalOpen(true);
@@ -99,10 +106,10 @@ const Clients: React.FC = () => {
     }
   };
   
-  const totalClients = clients.length;
-  const activeClients = clients.filter(c => c.status === ClientStatus.Active).length;
-  const inactiveClients = clients.filter(c => c.status === ClientStatus.Inactive).length;
-  const needsReview = clients.filter(c => c.pendingDocs > 10).length;
+  const totalClients = adminClients.length;
+  const activeClients = adminClients.filter(c => c.status === ClientStatus.Active).length;
+  const inactiveClients = adminClients.filter(c => c.status === ClientStatus.Inactive).length;
+  const needsReview = adminClients.filter(c => c.pendingDocs > 10).length;
 
   return (
     <div>

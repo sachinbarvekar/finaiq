@@ -81,7 +81,8 @@ const LoginPage: React.FC = () => {
             {error && <p className="text-sm text-red-500">{error}</p>}
             
             <p className="text-center text-xs text-slate-400 !mt-2">
-              <b>Admin:</b> admin@finaiq.com / admin123<br/>
+              <b>Admin 1:</b> admin@finaiq.com / admin123<br/>
+              <b>Admin 2:</b> admin2@finaiq.com / admin123<br/>
               <b>Client:</b> client@innovate.com / client123
             </p>
 

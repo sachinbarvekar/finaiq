@@ -22,6 +22,7 @@ export interface Client {
   approvedDocs: number;
   pendingDocs: number;
   rejectedDocs: number;
+  adminId: string; //
 }
 
 export enum FolderStatus {
@@ -65,7 +66,7 @@ export interface Document {
     dueDate: string;
 }
 
-export type UserRole = 'Admin' | 'Client';
+export type UserRole = 'Admin' | 'Client' | 'SuperAdmin';
 
 export interface User {
   id: string;

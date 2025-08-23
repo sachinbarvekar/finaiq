@@ -21,6 +21,7 @@ import { useClients } from '../contexts/ClientContext';
 import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
+import { MOCK_ADMIN_USERS } from '../constants';
 
 
 // --- Page-specific components ---
@@ -30,7 +31,7 @@ const Trend: React.FC<{ value: number }> = ({ value }) => {
     return (
         <span className={`flex items-center text-xs font-semibold ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
             <Icon name={isPositive ? 'arrow-trending-up' : 'arrow-trending-down'} className="w-4 h-4 mr-1" />
-            {Math.abs(value)}% vs last week
+            {Math.abs(value)}% vs last month
         </span>
     );
 };
@@ -40,22 +41,26 @@ interface StatCardProps {
     title: string;
     value: string;
     icon: IconName;
-    trend: number;
-    to: string;
+    trend?: number;
+    to?: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon, trend, to }) => (
-    <Link to={to} className="bg-white p-5 rounded-2xl shadow-sm flex flex-col justify-between transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
-        <div className="flex items-center justify-between">
-            <p className="text-slate-500 text-sm font-medium">{title}</p>
-            <Icon name={icon} className="w-6 h-6 text-slate-400" />
+const StatCard: React.FC<StatCardProps> = ({ title, value, icon, trend, to }) => {
+    const content = (
+         <div className="bg-white p-5 rounded-2xl shadow-sm flex flex-col justify-between transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-full">
+            <div className="flex items-center justify-between">
+                <p className="text-slate-500 text-sm font-medium">{title}</p>
+                <Icon name={icon} className="w-6 h-6 text-slate-400" />
+            </div>
+            <div>
+                <p className="text-3xl font-bold text-slate-800 mt-2">{value}</p>
+                {trend !== undefined && <Trend value={trend} />}
+            </div>
         </div>
-        <div>
-            <p className="text-3xl font-bold text-slate-800 mt-2">{value}</p>
-            <Trend value={trend} />
-        </div>
-    </Link>
-);
+    );
+
+    return to ? <Link to={to} className="block h-full">{content}</Link> : content;
+}
 
 
 // 2. Weekly Activity Chart (Area Chart)
@@ -196,9 +201,17 @@ const QuickActions: React.FC = () => (
 
 const AdminDashboard: React.FC = () => {
   const { currentUser } = useProfile();
-  const { clients } = useClients();
+  const { user } = useAuth();
+  const { clients, folders } = useClients();
   const { documents } = useDocuments();
-  const pendingReviews = documents.filter(d => d.status === DocumentProcessingStatus.ReviewRequired).length;
+  
+  // Filter data for the current admin
+  const adminClients = clients.filter(c => c.adminId === user?.id);
+  const adminClientIds = adminClients.map(c => c.id);
+  const adminFolderIds = folders.filter(f => adminClientIds.includes(f.clientId)).map(f => f.id);
+  const adminDocuments = documents.filter(d => adminFolderIds.includes(d.folderId));
+  
+  const pendingReviews = adminDocuments.filter(d => d.status === DocumentProcessingStatus.ReviewRequired).length;
 
   if (!currentUser) return null;
 
@@ -211,8 +224,8 @@ const AdminDashboard: React.FC = () => {
       
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard to="/dashboard/clients" title="Total Clients" value={String(clients.length)} icon="users" trend={2.5} />
-          <StatCard to="/dashboard/documents?status=all" title="Documents Processed" value={String(documents.length)} icon="document-text" trend={5.2} />
+          <StatCard to="/dashboard/clients" title="Your Clients" value={String(adminClients.length)} icon="users" trend={2.5} />
+          <StatCard to="/dashboard/documents" title="Documents Processed" value={String(adminDocuments.length)} icon="document-text" trend={5.2} />
           <StatCard to={`/dashboard/documents?status=${DocumentProcessingStatus.ReviewRequired}`} title="Pending Reviews" value={String(pendingReviews)} icon="clock" trend={-1.8} />
           <StatCard to="/dashboard" title="Avg. Accuracy" value="98.7%" icon="target" trend={0.5} />
       </div>
@@ -383,16 +396,181 @@ const ClientDashboard: React.FC = () => {
   );
 };
 
+// --- Super Admin Dashboard Components ---
+
+const PlatformGrowthChart: React.FC = () => {
+    const data = Array.from({ length: 30 }, (_, i) => ({
+        day: `${i + 1}`,
+        documents: 1500 + i * 50 + Math.random() * 300,
+    }));
+    return (
+        <div className="bg-white p-6 rounded-2xl shadow-sm h-full flex flex-col">
+            <h2 className="text-xl font-bold text-slate-800 mb-4">Platform Document Growth (30d)</h2>
+            <div className="w-full flex-grow">
+                <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <defs>
+                            <linearGradient id="colorGrowth" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="rgb(var(--color-primary))" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="rgb(var(--color-primary))" stopOpacity={0}/>
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />
+                        <XAxis dataKey="day" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} interval={4} />
+                        <YAxis tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} width={30}/>
+                        <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e0e0e0', borderRadius: '0.5rem' }} />
+                        <Area type="monotone" dataKey="documents" stroke="rgb(var(--color-primary))" fill="url(#colorGrowth)" strokeWidth={2} />
+                    </AreaChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+    );
+};
+
+const DocumentStatusChart: React.FC = () => {
+    const { documents } = useDocuments();
+    const stats = {
+        ready: documents.filter(d => d.status === DocumentProcessingStatus.Ready).length,
+        review: documents.filter(d => d.status === DocumentProcessingStatus.ReviewRequired).length,
+        error: documents.filter(d => d.status === DocumentProcessingStatus.ExportError).length,
+    };
+    const total = stats.ready + stats.review + stats.error;
+    const chartData = [
+        { name: 'Ready', value: stats.ready },
+        { name: 'Review', value: stats.review },
+        { name: 'Error', value: stats.error },
+    ];
+    const COLORS = ['#22c55e', '#f59e0b', '#ef4444'];
+
+    return (
+        <div className="bg-white p-6 rounded-2xl shadow-sm h-full flex flex-col">
+            <h2 className="text-xl font-bold text-slate-800 mb-4">Document Status Overview</h2>
+            <div className="w-full flex-grow">
+                <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                        <Pie data={chartData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} fill="#8884d8" paddingAngle={5} dataKey="value">
+                            {chartData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                        </Pie>
+                        <Tooltip />
+                        <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-2xl font-bold fill-slate-800">{total}</text>
+                        <text x="50%" y="50%" dy={20} textAnchor="middle" className="text-sm fill-slate-500">Total Docs</text>
+                    </PieChart>
+                </ResponsiveContainer>
+            </div>
+            <div className="flex justify-around text-center mt-4">
+                {chartData.map((item, index) => (
+                    <div key={item.name} className="flex items-center text-sm">
+                        <span className="w-3 h-3 rounded-full mr-2" style={{backgroundColor: COLORS[index]}}></span>
+                        <span>{item.name}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+const PlatformActivityFeed: React.FC = () => {
+    const activityData = [
+        { id: 1, icon: 'user-plus' as IconName, detail: 'Creative Minds signed up.', time: '2m ago' },
+        { id: 2, icon: 'check-circle' as IconName, detail: 'System update v2.1 deployed successfully.', time: '1h ago' },
+        { id: 3, icon: 'exclamation-circle' as IconName, detail: 'API latency spike detected.', time: '3h ago' },
+        { id: 4, icon: 'users' as IconName, detail: 'New admin Jane Smith was invited.', time: '5h ago' },
+    ];
+    return (
+        <div className="bg-white p-6 rounded-2xl shadow-sm h-full flex flex-col">
+            <h2 className="text-xl font-bold text-slate-800 mb-4">Recent Platform Activity</h2>
+            <div className="flex-grow space-y-4 -mx-2 px-2 overflow-y-auto">
+                {activityData.map(item => (
+                    <div key={item.id} className="flex items-start">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 mr-3">
+                            <Icon name={item.icon} className="w-5 h-5 text-slate-500" />
+                        </div>
+                        <div className="flex-grow">
+                            <p className="text-sm text-slate-800">{item.detail}</p>
+                            <p className="text-xs text-slate-400 mt-0.5">{item.time}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+const SuperAdminQuickLinks: React.FC = () => (
+    <div className="bg-white p-6 rounded-2xl shadow-sm h-full flex flex-col">
+        <h2 className="text-xl font-bold text-slate-800 mb-4">Quick Links</h2>
+        <div className="flex-grow flex flex-col justify-center space-y-2">
+            <Link to="/dashboard/team" className="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                <Icon name="briefcase" className="w-5 h-5 text-primary mr-3"/>
+                <span className="font-medium text-slate-700">Manage Admins</span>
+            </Link>
+            <Link to="/dashboard/system-health" className="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                <Icon name="server" className="w-5 h-5 text-primary mr-3"/>
+                <span className="font-medium text-slate-700">System Health</span>
+            </Link>
+             <Link to="/dashboard/settings" className="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                <Icon name="settings" className="w-5 h-5 text-primary mr-3"/>
+                <span className="font-medium text-slate-700">Global Settings</span>
+            </Link>
+        </div>
+    </div>
+);
+
+
+// --- Super Admin Dashboard View ---
+
+const SuperAdminDashboard: React.FC = () => {
+    const { clients } = useClients();
+    const { documents } = useDocuments();
+    const totalAdmins = MOCK_ADMIN_USERS.length;
+    const totalUsers = clients.length + totalAdmins + 1; // Clients + Admins + 1 SuperAdmin
+
+    return (
+        <div className="space-y-6">
+            <div>
+                <h1 className="text-3xl font-bold text-slate-800">Super Admin Overview</h1>
+                <p className="text-slate-500">Platform-wide health and statistics.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard to="/dashboard/team" title="Total Admins" value={String(totalAdmins)} icon="users" trend={1.2} />
+                <StatCard to="/dashboard/clients" title="Total Clients" value={String(clients.length)} icon="briefcase" trend={3.1} />
+                <StatCard to="/dashboard/documents" title="Documents Processed" value={String(documents.length)} icon="document-text" trend={8.5} />
+                <StatCard to="/dashboard/system-health" title="API Uptime" value="99.98%" icon="server" trend={0.01} />
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 h-[400px]">
+                    <PlatformGrowthChart />
+                </div>
+                <div className="lg:col-span-1 h-[400px]">
+                   <DocumentStatusChart />
+                </div>
+                 <div className="lg:col-span-2 h-[400px]">
+                    <PlatformActivityFeed />
+                </div>
+                 <div className="lg:col-span-1 h-[400px]">
+                    <SuperAdminQuickLinks />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
 // --- Main Dashboard Component ---
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
   
+  if (user?.role === 'SuperAdmin') {
+    return <SuperAdminDashboard />;
+  }
+
   if (user?.role === 'Client') {
     return <ClientDashboard />;
   }
 
-  // Fallback to AdminDashboard for admins or if role is not defined
   return <AdminDashboard />;
 };
 

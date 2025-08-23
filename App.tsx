@@ -22,6 +22,9 @@ import ClientProfilePage from './pages/ClientProfilePage';
 import Workflows from './pages/Workflows';
 import AllDocumentsPage from './pages/AllDocumentsPage';
 import UserProfilePage from './pages/UserProfilePage';
+import TeamManagementPage from './pages/TeamManagementPage';
+import SystemHealthPage from './pages/SystemHealthPage';
+import AdminDetailsPage from './pages/AdminDetailsPage';
 
 const App: React.FC = () => {
   return (
@@ -51,6 +54,10 @@ const App: React.FC = () => {
                         <Route path="/folders/:folderId/documents/:documentId" element={<DocumentViewPage />} />
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/workflows" element={<Workflows />} />
+                        {/* SuperAdmin Routes */}
+                        <Route path="/team" element={<TeamManagementPage />} />
+                        <Route path="/team/:adminId" element={<AdminDetailsPage />} />
+                        <Route path="/system-health" element={<SystemHealthPage />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </MainLayout>
